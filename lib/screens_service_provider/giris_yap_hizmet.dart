@@ -1,7 +1,28 @@
-import 'package:flutter/material.dart';
-import 'package:ustasi_yapsin/screens_service_provider/kayit_tercih.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ustasi_yapsin/models/busines_user.dart';
+import 'package:ustasi_yapsin/screens_service_provider/kayit_tercih.dart';
+import 'package:http/http.dart' as http;
 import 'kayit_basarili.dart';
+
+void foo(BuildContext context) async {
+  final prefs = await SharedPreferences.getInstance();
+  username = prefs.getString('username').toString();
+
+  if (!username.isEmpty) {
+    print(prefs.getString('username').toString());
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => DevamEt()),
+    );
+  } else {
+    print("boş");
+  }
+}
+
+String username = '';
 
 
 class GirisHizmet extends StatelessWidget {
@@ -27,7 +48,8 @@ class MyCustomForm extends StatefulWidget {
     return MyCustomFormState();
   }
 }
-
+final gsm = TextEditingController();
+final password = TextEditingController();
 // Create a corresponding State class.
 // This class holds data related to the form.
 class MyCustomFormState extends State<MyCustomForm> {
@@ -36,9 +58,70 @@ class MyCustomFormState extends State<MyCustomForm> {
   //
   // Note: This is a GlobalKey<FormState>,
   // not a GlobalKey<MyCustomFormState>.
+  var isLoading = false;
+  int statusCode = 0;
   final _formKey = GlobalKey<FormState>();
   bool _passwordVisible = true;
+  Future<User> login(
+        String mail, String password, BuildContext context) async {
+          setState(() {isLoading = true;});
+      print(mail + password);
+      final response = await http.post(
+        Uri.parse('https://ustasiyapsin-api.herokuapp.com/api/auth/login'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'gsm': gsm.text,
+          'mail': gsm.text,
+          'password': password
+        }),
+      );
 
+      if (response.statusCode == 200) {
+        setState(() {
+          isLoading = false;
+        });
+        statusCode = 200;
+        print(response.statusCode);
+        final prefs = await SharedPreferences.getInstance();
+        var result = jsonDecode(response.body);
+        print(result['data']);
+        prefs.setString('username', result['data']['mail']);
+        prefs.setString('name', result['data']['name']);
+        prefs.setString('surname', result['data']['surname']);
+        prefs.setString('gsm', result['data']['gsm']);
+        prefs.setString('id', result['data']['_id']);
+        prefs.setString('adress', jsonEncode(result['data']['adress']));
+        if (result['data']['img'] != null) {
+          prefs.setString('img', result['data']['img']);
+        }
+        if(result['data']['img']==null){
+          prefs.setString('img', '');
+        }
+
+        // if (rememberMe) {
+        //   print('beni hatırla');
+        //   addSession(usernames.text.toString(), passwords.text.toString(),
+        //       result['data']['_id']);
+        //   print('hatırladım');
+        // } else {
+        //   print('beni hatırlama');
+        // }
+        print(prefs.getString('adress'));
+        
+        foo(context);
+
+        return User.fromJson(jsonDecode(response.body));
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        showAlertDialogFailed(context);
+         
+        throw Exception();
+      }
+    }
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +140,20 @@ class MyCustomFormState extends State<MyCustomForm> {
     double height3 = height - padding.top - kToolbarHeight;
 
     // Build a Form widget using the _formKey created above.
-    return Column(
+    return isLoading
+            ? Padding(
+                padding: const EdgeInsets.fromLTRB(0, 350, 0, 0),
+                child: Column(
+                  children: [
+                    Center(child: CircularProgressIndicator()),
+                    Center(child:Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('Giriş Yapılıyor...', style:TextStyle(fontSize:18, fontWeight: FontWeight.bold),),
+                    ))
+                  ],
+                ),
+              )
+            :Column(
       children: [
         Form(
           key: _formKey,
@@ -79,6 +175,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(40, 40, 40, 0),
                   child: TextFormField(
+                    controller: gsm,
                     // The validator receives the text that the user has entered.
                     decoration: InputDecoration(
                         contentPadding: new EdgeInsets.symmetric(
@@ -101,6 +198,7 @@ class MyCustomFormState extends State<MyCustomForm> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(40, 10, 40, 0),
                 child: TextFormField(
+                  controller: password,
                   obscureText: _passwordVisible,
                   enableSuggestions: false,
                   autocorrect: false,
@@ -157,6 +255,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                     textColor: Colors.white,
                     color: Colors.purple,
                     onPressed: () {
+                      login(gsm.text, password.text, context);
                       // Validate returns true if the form is valid, or false otherwise.
                       /* if (_formKey.currentState!.validate()) {
                         // If the form is valid, display a snackbar. In the real world,
@@ -165,10 +264,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                           const SnackBar(content: Text('Processing Data')),
                         );
                       }*/
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => DevamEt()),
-                      );
+                   
                     },
                     child: const Text('Giriş Yap'),
                   ),
@@ -217,4 +313,27 @@ class MyCustomFormState extends State<MyCustomForm> {
 
 
 
+showAlertDialogFailed(BuildContext context) {
+  // Create button
+  Widget okButton = FlatButton(
+    child: Text("OK"),
+    onPressed: () {
+      Navigator.of(context).pop();
+    },
+  );
 
+  // Create AlertDialog
+  AlertDialog alert = AlertDialog(
+    title: Text("Giriş Başarısız!"),
+    content: Text("Kullanıcı Adı veya Şifreniz Yanlış"),
+    actions: [],
+  );
+
+  // show the dialog
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return alert;
+    },
+  );
+}
