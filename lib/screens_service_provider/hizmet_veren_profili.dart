@@ -1,16 +1,27 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:ustasi_yapsin/external_widgets/BottomNavigationBar_hv.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
+import 'package:ustasi_yapsin/models/demand.dart';
+import 'package:http/http.dart' as http;
 
 import 'isin_yapildigini_onayla_hv.dart';
 
 
 
-class HizmetVerenProfil extends StatelessWidget {
-  const HizmetVerenProfil({Key? key}) : super(key: key);
+class HizmetVerenProfil extends StatefulWidget {
+  final int state;
+  final String id;
+  HizmetVerenProfil({required this.state, required this.id}) : super();
 
+  @override
+  State<HizmetVerenProfil> createState() => _HizmetVerenProfilState();
+}
+
+class _HizmetVerenProfilState extends State<HizmetVerenProfil> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -23,7 +34,7 @@ class HizmetVerenProfil extends StatelessWidget {
           right: true,
           child: SingleChildScrollView(
               child: Stack(
-            children: [ProfilIcerik()],
+            children: [ProfilIcerik(state: widget.state, context: context, demandId: widget.id,)],
           )),
         ),
         bottomNavigationBar: NavigationBottom(),
@@ -31,15 +42,22 @@ class HizmetVerenProfil extends StatelessWidget {
     );
   }
 }
-
+int states = 0;
+List<Demand> demandDetail = [];
 class ProfilIcerik extends StatefulWidget {
-  const ProfilIcerik({Key? key}) : super(key: key);
+  final int state;
+  BuildContext context;
+  final String demandId;
 
+  ProfilIcerik(
+      {required this.state, required this.context, required this.demandId})
+      : super();
   @override
   _ProfilIcerikState createState() => _ProfilIcerikState();
 }
 
 class _ProfilIcerikState extends State<ProfilIcerik> {
+  var isLoader = false;
   _makingPhoneCall() async {
     const url = 'tel:+90 5059948910';
     if (await canLaunch(url)) {
@@ -48,12 +66,80 @@ class _ProfilIcerikState extends State<ProfilIcerik> {
       throw 'Could not launch $url';
     }
   }
+  Future<void> getDemands() async {
+    setState(() {
+      isLoader = true;
+    });
+    print(widget.demandId + " aydiii");
+    demandDetail.clear();
+    print("fonksiyon başladı");
+    final response = await http.get(
+      Uri.parse(
+          'https://ustasiyapsin-api.herokuapp.com/api/demand/' + widget.demandId),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print(response.statusCode);
+      print(response.body);
+      print('deneme');
+      var result = jsonDecode(response.body);
+      setState(() {
+        demandDetail.add(Demand(
+            id: result['data']['_id'],
+            company: result['data']['company'],
+            user: result['data']['user'],
+            service: result['data']['service'],
+            location: result['data']['location'],
+            time: result['data']['time'],
+            date: result['data']['date'],
+            question: result['data']['question'],
+            answer: result['data']['answer'],
+            status: result['data']['status'],
+            isActive: result['data']['isActive'],
+            price: result['data']['price'],
+            offerDescription: result['data']['offerDescription'],
+            offerPrice: result['data']['offerPrice']));
+        print(demandDetail[0].company);
+        isLoader=false;
+      });
+    } else {
+      throw Exception().toString();
+    }
+  }
+
+ @override
+  void initState() {
+    print('dodo');
+    getDemands();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
         color: Colors.white,
         width: MediaQuery.of(context).size.width,
-        child: Column(
+        child:  isLoader
+            ? Padding(
+                padding: const EdgeInsets.fromLTRB(0, 350, 0, 0),
+                child: Column(
+                  children: [
+                    Center(child: CircularProgressIndicator()),
+                    Center(
+                        child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        '',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                    ))
+                  ],
+                ),
+              )
+            :Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Padding(
@@ -97,7 +183,7 @@ class _ProfilIcerikState extends State<ProfilIcerik> {
                                       padding:
                                           const EdgeInsets.fromLTRB(0, 0, 0, 0),
                                       child: Text(
-                                        'Ahmet Usta',
+                                         demandDetail[0].service[0][2].toString(),
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
@@ -108,7 +194,7 @@ class _ProfilIcerikState extends State<ProfilIcerik> {
                                       padding:
                                           const EdgeInsets.fromLTRB(0, 5, 0, 0),
                                       child: Text(
-                                        'Boya Badana',
+                                        demandDetail[0].service[0][0].toString(),
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                             color: Colors.black, fontSize: 10),
@@ -153,20 +239,28 @@ class _ProfilIcerikState extends State<ProfilIcerik> {
                                                   },
                                                 ))),
                                         Text(
-                                          '14 Yorum',
+                                          '0 Yorum',
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                               color: Colors.black,
                                               fontSize: 12),
                                         ),
                                         Padding(padding: const EdgeInsets.fromLTRB(35,0,0,0),
-                                          child: Text(
+                                          child:
+                                          demandDetail[0].status == 'moving'?
+                                           Text(
                                             'Teklif bekleniyor',
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
                                                 color: Colors.blue,
                                                 fontSize: 12),
-                                          ),
+                                          ):Text(
+                                            'Devam Ediyor',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                color: Colors.blue,
+                                                fontSize: 12),
+                                          )
                                         ),
                                       ],
                                     ),
@@ -222,12 +316,12 @@ class _ProfilIcerikState extends State<ProfilIcerik> {
                                         MediaQuery.of(context).size.width / 2,
                                     child: FlatButton(
                                         onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    HizmetVerenProfil()),
-                                          );
+                                          // Navigator.push(
+                                          //   context,
+                                          //   MaterialPageRoute(
+                                          //       builder: (context) =>
+                                          //           HizmetVerenProfil()),
+                                          // );
                                         },
                                         child: Column(
                                           children: [
@@ -282,7 +376,7 @@ class _ProfilIcerikState extends State<ProfilIcerik> {
                         child: Padding(
                           padding: const EdgeInsets.fromLTRB(3, 10, 0, 0),
                           child: Text(
-                              'Merkezefendi/Denizli',
+                             demandDetail[0].location[0][1].toString()+'/'+demandDetail[0].location[0][0].toString(),
                               style: TextStyle(
                                   color: Colors.grey.shade500,
                                   fontWeight: FontWeight.bold,
@@ -349,131 +443,37 @@ class _ProfilIcerikState extends State<ProfilIcerik> {
                       endIndent: 0,
                     ),
                   ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
-                            child: Text('Neresi Boyanacak ?',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 10)),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-                            child: Text('90 metre kare oda /ev boyancak',
-                                style: TextStyle( color: Colors.black,
-                                  fontSize: 10,)),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
-                            child: Text('Boyanacak kaç oda var ?',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 10)),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-                            child: Text('Boyancak alan 3 oda',
-                                style: TextStyle( color: Colors.black,
-                                  fontSize: 10,)),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
-                            child: Text('Fiyata malzeme dahilmi ?',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 10)),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-                            child: Text('Fiyata malzeme dahil',
-                                style: TextStyle( color: Colors.black,
-                                  fontSize: 10,)),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
-                            child: Text('Ev /oda eşyalımı?',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 10)),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-                            child: Text('Ev /oda eşyalı',
-                                style: TextStyle( color: Colors.black,
-                                  fontSize: 10,)),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
-                            child: Text('Boya ne zaman yapılcak?',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 10)),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-                            child: Text('işim acil (hemen)-fiyat bekliyorum',
-                                style: TextStyle( color: Colors.black,
-                                  fontSize: 10,)),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
-                            child: Text('İşin detayları nelerdir?',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 10)),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-                            child: Text('Boya ne 2 hafta Boya ne 2 hafta Boya ne 2 hafta ',
-                                style: TextStyle( color: Colors.black,
-                                  fontSize: 10,)),
-                          )
-                        ],
-                      ),
-                    ],
+                  Container(
+                    child: SizedBox(
+                      height:150,
+                       width: MediaQuery.of(context).size.width - 50,
+                      child: ListView.builder(
+                        itemCount: demandDetail[0].question[0].length,
+                        itemBuilder:(BuildContext context, int index){
+                         return Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Column(crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
+                                  child: Text( demandDetail[0].question[0][index].toString(),
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold, fontSize: 10)),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                  child: Text(demandDetail[0].answer[0][index].toString(),
+                                      style: TextStyle( color: Colors.black,
+                                        fontSize: 10,)),
+                                )
+                              ],
+                            ),
+                          ],
+                        );
+                      
+                        } ),
+                    ),
                   ),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,

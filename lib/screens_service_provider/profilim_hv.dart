@@ -1,7 +1,18 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ustasi_yapsin/external_widgets/BottomNavigationBar_hv.dart';
+import 'package:http/http.dart' as http;
 
-
+String username = '';
+  String name = '';
+  String surname = '';
+  String adress = '';
+  String gsm = '';
+  String userId = '';
+  String responses = '';
+  String mail = '';
 class Profil extends StatelessWidget {
   const Profil({Key? key}) : super(key: key);
 
@@ -37,12 +48,78 @@ class _ProfilimState extends State<Profilim> {
 
   final _formKey = GlobalKey<FormState>();
   bool _passwordVisible = true;
+  var isLoader = false;
+  void getSession() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      username = prefs.getString('username').toString();
+      name = prefs.getString('name').toString();
+      surname = prefs.getString('surname').toString();
+      gsm = prefs.getString('gsm').toString();
+      userId = prefs.getString('id').toString();
+      adress = prefs.getString('adress').toString();
+      mail = prefs.getString('mail').toString();
+    });
 
+    print(userId + username + name);
+  }
+   final nameController = TextEditingController(text:name);
+  final mailController = TextEditingController(text:username);
+  final gsmController = TextEditingController(text:gsm);
+
+  Future<String> login(String mail, String gsm, String name) async {
+    setState(() {
+      isLoader = true;
+    });
+  final response = await http.put(
+    Uri.parse('https://ustasiyapsin-api.herokuapp.com/api/user/'+userId),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(
+        <String, String>{'gsm': mail, 'mail': mail, 'name': name}),
+  );
+
+  if (response.statusCode == 201) {
+    print(response.statusCode);
+    setState(() {
+        responses = '201';
+    });
+  
+    isLoader = false;
+    return '201';
+
+  } else {
+    isLoader = false;
+    return '500';
+    throw Exception();
+  }
+}
+
+  @override
+  void initState() {
+    getSession();
+    // TODO: implement initState
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
-      child:Column(
+      child:  isLoader
+            ? Padding(
+                padding: const EdgeInsets.fromLTRB(0, 350, 0, 0),
+                child: Column(
+                  children: [
+                    Center(child: CircularProgressIndicator()),
+                    Center(child:Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('Güncelleme Yapılıyor...', style:TextStyle(fontSize:18, fontWeight: FontWeight.bold),),
+                    ))
+                  ],
+                ),
+              )
+           :Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SingleChildScrollView(
@@ -84,7 +161,7 @@ class _ProfilimState extends State<Profilim> {
                               child: Center(
                                 child: Stack(children: [
                                   Text(
-                                    'Ahmet Boyacı',
+                                    name,
                                     style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold),
@@ -92,7 +169,7 @@ class _ProfilimState extends State<Profilim> {
                                   Padding(
                                     padding: const EdgeInsets.fromLTRB(40, 20, 0, 0),
                                     child: Text(
-                                      'Denizli',
+                                      '',
                                       style: TextStyle(
                                           color:Colors.grey.shade500,
                                           fontSize: 12,
@@ -146,7 +223,7 @@ class _ProfilimState extends State<Profilim> {
           Padding(
             padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
             child: TextFormField(
-
+              controller:nameController,
               enableSuggestions: false,
               autocorrect: false,
               // The validator receives the text that the user has entered.
@@ -168,7 +245,7 @@ class _ProfilimState extends State<Profilim> {
           Padding(
             padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
             child: TextFormField(
-
+              controller:mailController,
               enableSuggestions: false,
               autocorrect: false,
               // The validator receives the text that the user has entered.
@@ -190,7 +267,7 @@ class _ProfilimState extends State<Profilim> {
           Padding(
             padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
             child: TextFormField(
-
+              controller:gsmController,
               enableSuggestions: false,
               autocorrect: false,
               // The validator receives the text that the user has entered.
@@ -255,7 +332,9 @@ class _ProfilimState extends State<Profilim> {
           ),
           SizedBox(
             width: 180,
-            child:FlatButton(color:Colors.deepPurple, onPressed: (){}, child: Text('Güncelle', style:TextStyle(color:Colors.white)),)
+            child:FlatButton(color:Colors.deepPurple, onPressed: (){
+               login(mailController.text, gsmController.text, nameController.text);
+            }, child: Text('Güncelle', style:TextStyle(color:Colors.white)),)
           )
         ],
       )

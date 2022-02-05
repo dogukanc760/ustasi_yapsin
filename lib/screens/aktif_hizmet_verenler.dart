@@ -283,7 +283,10 @@ class _HizmetVerenListeState extends State<HizmetVerenListe> {
                                                               onPressed: () {
                                                                 Navigator.push(
                                                                   context,
-                                                                  MaterialPageRoute(builder: (context) => HizmetVerenProfil()),
+                                                                  MaterialPageRoute(builder: (context) => HizmetVerenProfil(
+                                                                    id: "1",
+                                                                    state: 1,
+                                                                  )),
                                                                 );
                                                               },
                                                               child: Column(
