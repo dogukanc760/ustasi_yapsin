@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:ustasi_yapsin/external_widgets/BottomNavigationBar1.dart';
-import 'package:ustasi_yapsin/screens/talep_basarili.dart';
+import 'package:ustasi_yapsin/external_widgets/BottomNavigationBar_hv.dart';
+import 'package:ustasi_yapsin/screens_service_provider/hizmet_veren_profili.dart';
 
 import '../screens_service_provider/hizmet_veren_profili.dart';
 
-class AktifHizmetVerenler extends StatelessWidget {
-  const AktifHizmetVerenler({Key? key}) : super(key: key);
+class isler extends StatelessWidget {
+  const isler({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -53,49 +53,13 @@ class _HizmetVerenListeState extends State<HizmetVerenListe> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
                     child: Text(
-                      'Şu an aktif olan hizmet verenler',
+                      'Yapılmayı Beklenen işler',
                       textAlign: TextAlign.center,
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     ),
                   ),
                 ],
-              ),
-            ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width / 1.6,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-                    child: Text(
-                      'Tüm hizmet verenlerden yada istediğin hizmet verenlerden teklif alabilirsin',
-                      textAlign: TextAlign.center,
-                      style:
-                          TextStyle(color: Colors.grey.shade500, fontSize: 14),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width / 1.3,
-              child: FlatButton(
-                textColor: Colors.purple,
-                color: Colors.white,
-                shape: RoundedRectangleBorder(
-                    side: BorderSide(
-                  color: Colors.purple,
-                  style: BorderStyle.solid,
-                )),
-                onPressed: () {
-                  Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => TalepBasarili()),
-                );
-                },
-                child: const Text('Tüm hizmet verenlerden teklif al'),
               ),
             ),
             SizedBox(

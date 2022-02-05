@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ustasi_yapsin/screens_service_provider/kayit_bireysel.dart';
 import 'package:ustasi_yapsin/screens_service_provider/kayit_kurumsal.dart';
-
 class KayitTercih extends StatelessWidget {
   const KayitTercih({Key? key}) : super(key: key);
 
@@ -80,7 +79,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                   child: FlatButton(
                     onPressed: (){
                       setState(() {
-                        _isSelected = false;
+                        _isSelected = true;
                       });
                     },
                     child: TextFormField(
@@ -92,7 +91,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                           hintText: 'Bireysel Çalışıyorum',
                           suffixIcon: IconButton(
                             onPressed: () {},
-                            icon: _isSelected == false ? Icon(Icons.check)
+                            icon: _isSelected == true ? Icon(Icons.check)
                             :Icon(Icons.check, color: Colors.white,),
                           )),
 
@@ -112,7 +111,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                   child: FlatButton(
                     onPressed: (){
                       setState(() {
-                        _isSelected = true;
+                        _isSelected = false;
                       });
                     },
                     child: TextFormField(
@@ -124,7 +123,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                           hintText: 'Kurumsal Çalışıyorum',
                           suffixIcon: IconButton(
                             onPressed: () {},
-                            icon:  _isSelected == true ? Icon(Icons.check)
+                            icon:  _isSelected == false ? Icon(Icons.check)
                                 :Icon(Icons.check, color: Colors.white,),
                           )),
 
@@ -178,13 +177,13 @@ class MyCustomFormState extends State<MyCustomForm> {
                         context,
                         MaterialPageRoute(builder: (context) => Karsilama()),
                       );*/
-                      if(_isSelected == true){
+                      if(_isSelected == false){
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) => KurumsalKayit()),
                         );
                       }
-                      if(_isSelected == false){
+                      if(_isSelected == true){
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) => BireyselKayit()),

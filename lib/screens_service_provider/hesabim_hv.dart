@@ -1,62 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ustasi_yapsin/external_widgets/BottomNavigationBar_hv.dart';
-import 'package:ustasi_yapsin/screens/adreslerim.dart';
-import 'package:ustasi_yapsin/screens/destek.dart';
-import 'package:ustasi_yapsin/screens/guvenlik.dart';
-import 'package:ustasi_yapsin/screens/profilim.dart';
+import  'adreslerim_hv.dart';
+import 'destek_hv.dart';
+import 'guvenlik_hv.dart';
+import 'profilim_hv.dart';
 
-import 'girissayfasi.dart';
-
-String username ='';
-String name ='';
-String surname='';
-String adress = '';
-String gsm ='';
-String userId = '';
-
-class Hesabim extends StatefulWidget {
-  
-  const Hesabim({Key? key}) : super(key: key);
-
-  @override
-  State<Hesabim> createState() => _HesabimState();
-}
-
-class _HesabimState extends State<Hesabim> {
-    void getSession() async {
-
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      username = prefs.getString('username').toString();
-      name = prefs.getString('name').toString();
-      surname = prefs.getString('surname').toString();
-      gsm = prefs.getString('gsm').toString();
-      userId = prefs.getString('id').toString();
-      adress = prefs.getString('adress').toString();
-    });
-
-    print(userId+username+name);
-
-  }
-
-  
-
-  void destroySession(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => GirisSayfasi()),
-    );
-  }
-     
-  @override
-  void initState() {
-    getSession();
-    // TODO: implement initState
-    super.initState();
-  }
+class HesabimHizmet extends StatelessWidget {
+  const HesabimHizmet({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +45,9 @@ class _HesabimState extends State<Hesabim> {
                                             Colors.deepPurple,
                                           ],
                                           begin: Alignment.bottomLeft,
-                                          end: Alignment.topRight)),
+                                          end: Alignment.topRight
+                                      )
+                                  ),
                                   child: CircleAvatar(
                                     radius: 30.0,
                                     /*backgroundImage:
@@ -110,18 +62,17 @@ class _HesabimState extends State<Hesabim> {
                                   child: Center(
                                     child: Stack(children: [
                                       Text(
-                                        name ,
+                                        'Ahmet Boyacı',
                                         style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold),
                                       ),
                                       Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            40, 20, 0, 0),
+                                        padding: const EdgeInsets.fromLTRB(40, 20, 0, 0),
                                         child: Text(
-                                          adress,
+                                          'Denizli',
                                           style: TextStyle(
-                                              color: Colors.grey.shade500,
+                                            color:Colors.grey.shade500,
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold),
                                         ),
@@ -129,8 +80,7 @@ class _HesabimState extends State<Hesabim> {
                                     ]),
                                   ),
                                   height: 140.0,
-                                  width:
-                                      MediaQuery.of(context).size.width - 100.0,
+                                  width: MediaQuery.of(context).size.width - 100.0,
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(5),
                                       color: Colors.white,
@@ -147,8 +97,8 @@ class _HesabimState extends State<Hesabim> {
                     ],
                   )),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    child: Row(
+                    width:MediaQuery.of(context).size.width,
+                    child:Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Padding(
@@ -161,57 +111,19 @@ class _HesabimState extends State<Hesabim> {
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                          child: TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Profil()),
-                                );
-                              },
-                              child: Text('Profilim',
-                                  style: TextStyle(
-                                      color: Colors.grey.shade500,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16))),
+                          child: TextButton(onPressed: (){
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => Profil()),
+                            );
+                          }, child: Text('Profilim', style:TextStyle(color:Colors.grey.shade500, fontWeight: FontWeight.bold, fontSize: 16))),
                         )
                       ],
                     ),
                   ),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(40, 0, 0, 0),
-                          child: Icon(
-                            Icons.lock,
-                            color: Colors.grey,
-                            size: 23,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                          child: TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Guvenlik()),
-                                );
-                              },
-                              child: Text('Güvenlik',
-                                  style: TextStyle(
-                                      color: Colors.grey.shade500,
-                                      fontSize: 16))),
-                        )
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    child: Row(
+                    width:MediaQuery.of(context).size.width,
+                    child:Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Padding(
@@ -224,25 +136,94 @@ class _HesabimState extends State<Hesabim> {
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                          child: TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Destek()),
-                                );
-                              },
-                              child: Text('Whatsapp Destek',
-                                  style: TextStyle(
-                                      color: Colors.grey.shade500,
-                                      fontSize: 16))),
+                          child: TextButton(onPressed: (){
+                            /*Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => Hakkımda()),//bu kısım yapıılı deil
+                            )*/;
+                          }, child: Text('Hakkımda', style:TextStyle(color:Colors.grey.shade500, fontWeight: FontWeight.bold, fontSize: 16))),
                         )
                       ],
                     ),
                   ),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    child: Row(
+                    width:MediaQuery.of(context).size.width,
+                    child:Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(40, 0, 0, 0),
+                          child: Icon(
+                            Icons.comment,
+                            color: Colors.grey,
+                            size: 23,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                          child: TextButton(onPressed: (){
+                            /*Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => Sertifikalarım()),//bu kısım yapıılı deil
+                            )*/;
+                          }, child: Text('Sertifikalarım', style:TextStyle(color:Colors.grey.shade500, fontWeight: FontWeight.bold, fontSize: 16))),
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width:MediaQuery.of(context).size.width,
+                    child:Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(40, 0, 0, 0),
+                          child: Icon(
+                            Icons.lock,
+                            color: Colors.grey,
+                            size: 23,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                          child: TextButton(onPressed: (){
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => Guvenlik()),
+                            );
+                          }, child: Text('Güvenlik', style:TextStyle(color:Colors.grey.shade500, fontSize: 16))),
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width:MediaQuery.of(context).size.width,
+                    child:Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(40, 0, 0, 0),
+                          child: Icon(
+                            Icons.message,
+                            color: Colors.grey,
+                            size: 23,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                          child: TextButton(onPressed: (){
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => Destek()),
+                            );
+                          }, child: Text('Whatsapp Destek', style:TextStyle(color:Colors.grey.shade500, fontSize: 16))),
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width:MediaQuery.of(context).size.width,
+                    child:Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Padding(
@@ -255,19 +236,15 @@ class _HesabimState extends State<Hesabim> {
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                          child: TextButton(
-                              onPressed: () {},
-                              child: Text('Sık Sorulan Sorular',
-                                  style: TextStyle(
-                                      color: Colors.grey.shade500,
-                                      fontSize: 16))),
+                          child: TextButton(onPressed: (){}, child: Text('Sık Sorulan Sorular',
+                              style:TextStyle(color:Colors.grey.shade500, fontSize: 16))),
                         )
                       ],
                     ),
                   ),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    child: Row(
+                    width:MediaQuery.of(context).size.width,
+                    child:Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Padding(
@@ -280,19 +257,15 @@ class _HesabimState extends State<Hesabim> {
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                          child: TextButton(
-                              onPressed: () {},
-                              child: Text('Arkadaşına tavsiye et',
-                                  style: TextStyle(
-                                      color: Colors.grey.shade500,
-                                      fontSize: 16))),
+                          child: TextButton(onPressed: (){}, child: Text('Arkadaşına tavsiye et',
+                              style:TextStyle(color:Colors.grey.shade500, fontSize: 16))),
                         )
                       ],
                     ),
                   ),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    child: Row(
+                    width:MediaQuery.of(context).size.width,
+                    child:Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Padding(
@@ -305,25 +278,20 @@ class _HesabimState extends State<Hesabim> {
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                          child: TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Adreslerim()),
-                                );
-                              },
-                              child: Text('Adreslerim',
-                                  style: TextStyle(
-                                      color: Colors.grey.shade500,
-                                      fontSize: 16))),
+                          child: TextButton(onPressed: (){
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => Adreslerim()),
+                            );
+                          }, child: Text('Adreslerim',
+                              style:TextStyle(color:Colors.grey.shade500, fontSize: 16))),
                         )
                       ],
                     ),
                   ),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    child: Row(
+                    width:MediaQuery.of(context).size.width,
+                    child:Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Padding(
@@ -336,12 +304,8 @@ class _HesabimState extends State<Hesabim> {
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                          child: TextButton(
-                              onPressed: () {destroySession(context);},
-                              child: Text('Çıkış Yap',
-                                  style: TextStyle(
-                                      color: Colors.grey.shade500,
-                                      fontSize: 16))),
+                          child: TextButton(onPressed: (){}, child: Text('Çıkış Yap',
+                              style:TextStyle(color:Colors.grey.shade500, fontSize: 16))),
                         )
                       ],
                     ),

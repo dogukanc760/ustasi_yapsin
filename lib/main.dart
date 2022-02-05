@@ -1,8 +1,9 @@
+// @dart=2.9
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:ustasi_yapsin/screens//Karsilama2.dart';
-import 'package:ustasi_yapsin/screens/anasayfa.dart';
+
 
 void main() {
   runApp(MaterialApp(home: MyApp()));

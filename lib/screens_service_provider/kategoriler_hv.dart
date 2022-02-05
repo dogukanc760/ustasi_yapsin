@@ -1,10 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:ustasi_yapsin/external_widgets/BottomNavigationBar1.dart';
-import 'package:ustasi_yapsin/models/category.dart';
+import 'package:ustasi_yapsin/external_widgets/BottomNavigationBar_hv.dart';
 import 'package:ustasi_yapsin/screens/hizmetkarsilama.dart';
-import 'package:http/http.dart' as http;
 
 final List<String> categoryList = [
   '',
@@ -18,8 +14,6 @@ final List<String> categoryList = [
   'Teknoloji',
   'Tesisat'
 ];
-
-List<Category> categoryListe = [];
 
 class Kategoriler extends StatefulWidget {
   const Kategoriler({Key? key}) : super(key: key);
@@ -58,54 +52,10 @@ class KategoriListe extends StatefulWidget {
 }
 
 class _KategoriListeState extends State<KategoriListe> {
-  var isLoading = false;
-  Future<List<Category>> veriAl() async {
-    categoryListe.clear();
-    setState(() {
-      isLoading = true;
-    });
-    final response = await http.get(
-      Uri.parse('https://ustasiyapsin-api.herokuapp.com/api/category'),
-    );
-
-    if (response.statusCode == 200) {
-      var result = jsonDecode(response.body);
-      //  print(result['data'][0]['_id'])
-      setState(() {
-        for (var i = 0; i < result.length; i++) {
-          print(result['data'][i]);
-
-          categoryListe.add(Category(
-              name: result['data'][i]['name'],
-              img: result['data'][i]['img'],
-              isActive: result['data'][i]['isActive'],
-              showHome: result['data'][i]['showHome'],
-              id: result['data'][i]['_id']));
-          print(categoryListe[i].name);
-        }
-       
-      });
-      setState(() {isLoading=false;});
-      return categoryListe;
-    } else {
-      throw Exception();
-    }
-  }
-  @override
-  void initState() {
-    veriAl();
-    // TODO: implement initState
-    super.initState();
-  }
   @override
   Widget build(BuildContext context) {
     return Container(
-        child:  isLoading
-            ? Padding(
-                padding: const EdgeInsets.fromLTRB(0, 350, 0, 0),
-                child: Center(child: CircularProgressIndicator()),
-              )
-            :Column(
+        child: Column(
       children: [
         Column(
           children: [
@@ -180,7 +130,7 @@ class _KategoriListeState extends State<KategoriListe> {
                     child: ListView.builder(
                       shrinkWrap: true,
                       scrollDirection: Axis.vertical,
-                      itemCount: categoryListe.length,
+                      itemCount: 8,
                       itemBuilder: (BuildContext context, int index) => Row(
                         children: [
                           Card(
@@ -201,9 +151,8 @@ class _KategoriListeState extends State<KategoriListe> {
                                               color: Colors.purpleAccent)),
                                       child: Padding(
                                         padding: const EdgeInsets.all(3.0),
-                                        child: Image.network(
-                                           'https://ustasiyapsin-api.herokuapp.com/images/' +
-                                                categoryListe[index].img,
+                                        child: Image.asset(
+                                          'assets/kategori${index + 1}.png',
                                           height: 35,
                                           width: 35,
                                           fit: BoxFit.fill,
@@ -214,7 +163,7 @@ class _KategoriListeState extends State<KategoriListe> {
                                       padding: const EdgeInsets.fromLTRB(
                                           20, 0, 0, 0),
                                       child: Text(
-                                        categoryListe[index].name,
+                                        '${categoryList[index + 1]}',
                                         style: TextStyle(fontSize: 18),
                                       ),
                                     ),

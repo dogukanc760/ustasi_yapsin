@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ustasi_yapsin/screens_service_provider/kayit_tamamlama.dart';
 import 'package:ustasi_yapsin/screens_service_provider/kayit_tercih.dart';
 
 class KurumsalKayit extends StatelessWidget {
@@ -61,9 +62,13 @@ class MyCustomFormState extends State<MyCustomForm> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Center(child: Padding(
+                padding: const EdgeInsets.only(top:30),
+                child: Text('Kurumsal Kayıt', style: TextStyle(color:Colors.blueGrey[200], fontWeight: FontWeight.bold),),
+              )),
               Center(
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 70.0),
+                  padding: const EdgeInsets.only(top: 20.0),
                   child: Image(
                     image: AssetImage('assets/logo.png'),
                     height: 100,
@@ -74,13 +79,13 @@ class MyCustomFormState extends State<MyCustomForm> {
               ),
               Center(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(40, 40, 40, 0),
+                  padding: const EdgeInsets.fromLTRB(40, 20, 40, 0),
                   child: TextFormField(
                     // The validator receives the text that the user has entered.
                     decoration: InputDecoration(
                         contentPadding: new EdgeInsets.symmetric(
-                            vertical: 20.0, horizontal: 20.0),
-                        hintText: 'Gsm no veya Email',
+                            vertical: 18.0, horizontal: 20.0),
+                        hintText: 'İşyeri Ünvanı',
                         suffixIcon: IconButton(
                           onPressed: () {},
                           icon: Icon(Icons.check),
@@ -88,11 +93,99 @@ class MyCustomFormState extends State<MyCustomForm> {
 
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Gsm no veya Email Alanı Boş Geçilemez!';
+                        return 'İşyeri Ünvanı!';
                       }
                       return null;
                     },
                   ),
+                ),
+              ),
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
+                  child: TextFormField(
+                    // The validator receives the text that the user has entered.
+                    decoration: InputDecoration(
+                        contentPadding: new EdgeInsets.symmetric(
+                            vertical: 18.0, horizontal: 20.0),
+                        hintText: 'Vergi Numarsı',
+                        suffixIcon: IconButton(
+                          onPressed: () {},
+                          icon: Icon(Icons.check),
+                        )),
+
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Vergi Numarsı!';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+              ),
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
+                  child: TextFormField(
+                    // The validator receives the text that the user has entered.
+                    decoration: InputDecoration(
+                        contentPadding: new EdgeInsets.symmetric(
+                            vertical: 18.0, horizontal: 20.0),
+                        hintText: 'Adınız ve Soyadınız',
+                        suffixIcon: IconButton(
+                          onPressed: () {},
+                          icon: Icon(Icons.check),
+                        )),
+
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Adınız ve Soyadınız Boş Geçilemez!';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
+                child: TextFormField(
+                  // The validator receives the text that the user has entered.
+                  decoration: InputDecoration(
+                      contentPadding: new EdgeInsets.symmetric(
+                          vertical: 18.0, horizontal: 20.0),
+                      hintText: 'Mail Adresiniz',
+                      suffixIcon: IconButton(
+                        onPressed: () {},
+                        icon: Icon(Icons.check),
+                      )),
+
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Mail Adresiniz Boş Geçilemez!';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
+                child: TextFormField(
+                  // The validator receives the text that the user has entered.
+                  decoration: InputDecoration(
+                      contentPadding: new EdgeInsets.symmetric(
+                          vertical: 18.0, horizontal: 20.0),
+                      hintText: 'GSM no: +90',
+                      suffixIcon: IconButton(
+                        onPressed: () {},
+                        icon: Icon(Icons.check),
+                      )),
+
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'GSM no Boş Geçilemez!';
+                    }
+                    return null;
+                  },
                 ),
               ),
               Padding(
@@ -127,23 +220,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                 ),
               ),
 
-              Row(
-                children: [
 
-                  Padding(
-                    padding: const EdgeInsets.only(left: 250),
-                    child: TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          'Şifremi Unuttum',
-                          style: TextStyle(
-                              fontWeight: FontWeight.normal,
-                              color: Colors.purple,
-                              fontSize: 15),
-                        )),
-                  )
-                ],
-              ),
               //Text Button gelecek kayıt ol ve şifremi unuttum
 
               Padding(
@@ -162,34 +239,16 @@ class MyCustomFormState extends State<MyCustomForm> {
                           const SnackBar(content: Text('Processing Data')),
                         );
                       }*/
-                      /*  Navigator.pushReplacement(
+                      Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => Karsilama()),
-                      );*/
+                        MaterialPageRoute(builder: (context) => ProfilTamamla()),
+                      );
                     },
-                    child: const Text('Giriş Yap'),
+                    child: const Text('Kayıt Ol'),
                   ),
                 ),
               ),
-              Center(
-                child: FlatButton(
-                  minWidth: 250,
-                  textColor: Colors.purple,
-                  color: Colors.white,
-                  shape: RoundedRectangleBorder(
-                      side: BorderSide(
-                        color: Colors.purple,
-                        style: BorderStyle.solid,
-                      )),
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => KayitTercih()),
-                    );
-                  },
-                  child: const Text('Kayıt Ol'),
-                ),
-              ),
+
               Container(
                 width: MediaQuery.of(context).size.width,
                 height: 450,

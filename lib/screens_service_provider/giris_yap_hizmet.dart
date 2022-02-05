@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:ustasi_yapsin/screens_service_provider/kayit_tercih.dart';
 
+import 'kayit_basarili.dart';
+
+
 class GirisHizmet extends StatelessWidget {
   const GirisHizmet({Key? key}) : super(key: key);
 
@@ -162,10 +165,10 @@ class MyCustomFormState extends State<MyCustomForm> {
                           const SnackBar(content: Text('Processing Data')),
                         );
                       }*/
-                    /*  Navigator.pushReplacement(
+                      Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Karsilama()),
-                      );*/
+                        MaterialPageRoute(builder: (context) => DevamEt()),
+                      );
                     },
                     child: const Text('Giriş Yap'),
                   ),
@@ -207,4 +210,11 @@ class MyCustomFormState extends State<MyCustomForm> {
       ],
     );
   }
+
+
+
 }
+
+
+
+

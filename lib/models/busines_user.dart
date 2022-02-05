@@ -1,17 +1,33 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class User{
+class User {
   final String username;
   final String password;
   final String gsm;
   final String mail;
+  final List<String> comments;
+  final String about;
+  final String name;
 
-  
-  User({required this.username, required this.password, required this.gsm, required this.mail});
-  
-  factory User.fromJson(Map<String, dynamic> json){
-    return User(username: json['mail'], password: json['password'], gsm: json['gsm'], mail: json['mail'], );
+  User(
+      {required this.username,
+      required this.password,
+      required this.gsm,
+      required this.mail,
+      required this.name,
+      required this.comments,
+      required this.about});
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+        name: json['name'],
+        username: json['mail'],
+        password: json['password'],
+        gsm: json['gsm'],
+        mail: json['mail'],
+        about: json['about'],
+        comments: json['comments']);
   }
 
   Future<User> login(String mail, String password) async {
@@ -20,11 +36,8 @@ class User{
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
-      body: jsonEncode(<String, String>{
-        'gsm': mail,
-        'mail':mail,
-        'password':password
-      }),
+      body: jsonEncode(
+          <String, String>{'gsm': mail, 'mail': mail, 'password': password}),
     );
 
     if (response.statusCode == 200) {
@@ -39,4 +52,3 @@ class User{
     }
   }
 }
-

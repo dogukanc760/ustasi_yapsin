@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:ustasi_yapsin/screens/anasayfa.dart';
+import 'package:ustasi_yapsin/screens_service_provider/talep_basarili_hv.dart';
 
-
-class IsinYapildiginiOnayla extends StatelessWidget {
-  const IsinYapildiginiOnayla({Key? key}) : super(key: key);
+class IsinYapildiginiOnaylaHv extends StatelessWidget {
+  const IsinYapildiginiOnaylaHv({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +17,7 @@ class IsinYapildiginiOnayla extends StatelessWidget {
           right: true,
           child: SingleChildScrollView(
               child: Stack(
-            children: [OnaylamaKismi()],
+            children: [OnaylamaKismiHv()],
           )),
         ),
       ),
@@ -26,14 +25,14 @@ class IsinYapildiginiOnayla extends StatelessWidget {
   }
 }
 
-class OnaylamaKismi extends StatefulWidget {
-  const OnaylamaKismi({Key? key}) : super(key: key);
+class OnaylamaKismiHv extends StatefulWidget {
+  const OnaylamaKismiHv({Key? key}) : super(key: key);
 
   @override
   _OnaylamaKismiState createState() => _OnaylamaKismiState();
 }
 
-class _OnaylamaKismiState extends State<OnaylamaKismi> {
+class _OnaylamaKismiState extends State<OnaylamaKismiHv> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -122,7 +121,7 @@ class _OnaylamaKismiState extends State<OnaylamaKismi> {
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
               child: SizedBox(
-                  child: Text('Aldığınız hizmeti ve hizmet vereni değerlendirin.',
+                  child: Text('Müşteri memnuniyeti için en iyi teklifi verin ?',
                       textAlign: TextAlign.start,
                       style: TextStyle(color: Colors.grey.shade500, fontSize:10, fontWeight:FontWeight.bold))),
             ),
@@ -138,7 +137,7 @@ class _OnaylamaKismiState extends State<OnaylamaKismi> {
                         isDense: true,
                         contentPadding: EdgeInsets.all(10),
                         border: OutlineInputBorder(),
-                        hintText: 'Ödeme Tutarını Giriniz.',
+                        hintText: 'Teklifinizi giriniz',
                         hintStyle: TextStyle(
                           fontSize: 10,
                         )),
@@ -159,8 +158,10 @@ class _OnaylamaKismiState extends State<OnaylamaKismi> {
                           contentPadding:   EdgeInsets.symmetric(vertical: 100.0, horizontal: 5.0),
                           border: OutlineInputBorder(),
                           hintText:
-                              ' Hızlı Dönüş yaptı mı?\n\n'
-                              'İşinin Ehli mi ?\n\n',
+                              ' Malzeme ve işcilik ücretlerini belirtebilirsiniz.\n\n'
+                              'Tahmini iş süresini belirtebilirsiniz .\n\n'
+                                  'İş setaylarına göre çıkabilcek masrafları belirtiniz .\n\n',
+
 
                           hintStyle: TextStyle(
                             fontSize: 10,
@@ -175,9 +176,9 @@ class _OnaylamaKismiState extends State<OnaylamaKismi> {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            Anasayfa()));
+                            TalepBasariliHv()));
               },
-              child: Text('Tamamla',
+              child: Text('Gönder',
                   style:
                   TextStyle(color: Colors.white)),
               color: Colors.deepPurple,

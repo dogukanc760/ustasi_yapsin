@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:ustasi_yapsin/screens/anasayfa.dart';
+import 'package:ustasi_yapsin/screens_service_provider/anasayfa_hv.dart';
+import 'package:ustasi_yapsin/screens_service_provider/anasayfa_hv.dart.dart';
 
-
-class IsinYapildiginiOnayla extends StatelessWidget {
-  const IsinYapildiginiOnayla({Key? key}) : super(key: key);
+class IsIptalEdildiHv extends StatelessWidget {
+  const IsIptalEdildiHv({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,22 +18,22 @@ class IsinYapildiginiOnayla extends StatelessWidget {
           right: true,
           child: SingleChildScrollView(
               child: Stack(
-            children: [OnaylamaKismi()],
-          )),
+                children: [Detaylar()],
+              )),
         ),
       ),
     );
   }
 }
 
-class OnaylamaKismi extends StatefulWidget {
-  const OnaylamaKismi({Key? key}) : super(key: key);
+class Detaylar extends StatefulWidget {
+  const Detaylar({Key? key}) : super(key: key);
 
   @override
-  _OnaylamaKismiState createState() => _OnaylamaKismiState();
+  _DetaylarState createState() => _DetaylarState();
 }
 
-class _OnaylamaKismiState extends State<OnaylamaKismi> {
+class _DetaylarState extends State<Detaylar> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -66,7 +66,7 @@ class _OnaylamaKismiState extends State<OnaylamaKismi> {
                       'Ahmet Usta',
                       textAlign: TextAlign.center,
                       style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                      TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                     ),
                   ),
                   Padding(
@@ -99,7 +99,7 @@ class _OnaylamaKismiState extends State<OnaylamaKismi> {
                                 itemCount: 5,
                                 itemSize: 17,
                                 itemPadding:
-                                    EdgeInsets.symmetric(horizontal: 2.0),
+                                EdgeInsets.symmetric(horizontal: 2.0),
                                 itemBuilder: (context, _) => Icon(
                                   Icons.star,
                                   size: 2,
@@ -122,28 +122,11 @@ class _OnaylamaKismiState extends State<OnaylamaKismi> {
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
               child: SizedBox(
-                  child: Text('Aldığınız hizmeti ve hizmet vereni değerlendirin.',
+                  child: Text('İptal sebebinizi belirtin.',
                       textAlign: TextAlign.start,
                       style: TextStyle(color: Colors.grey.shade500, fontSize:10, fontWeight:FontWeight.bold))),
             ),
-            SizedBox(
-              width: 270,
-              child: Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                  child: TextField(
-                    minLines: 1,
-                    maxLines: 1,
-                    keyboardType: TextInputType.multiline,
-                    decoration: const InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.all(10),
-                        border: OutlineInputBorder(),
-                        hintText: 'Ödeme Tutarını Giriniz.',
-                        hintStyle: TextStyle(
-                          fontSize: 10,
-                        )),
-                  )),
-            ),
+
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
               child: SizedBox(
@@ -159,8 +142,7 @@ class _OnaylamaKismiState extends State<OnaylamaKismi> {
                           contentPadding:   EdgeInsets.symmetric(vertical: 100.0, horizontal: 5.0),
                           border: OutlineInputBorder(),
                           hintText:
-                              ' Hızlı Dönüş yaptı mı?\n\n'
-                              'İşinin Ehli mi ?\n\n',
+                          '',
 
                           hintStyle: TextStyle(
                             fontSize: 10,
@@ -175,7 +157,7 @@ class _OnaylamaKismiState extends State<OnaylamaKismi> {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            Anasayfa()));
+                            AnasayfaHizmet()));
               },
               child: Text('Tamamla',
                   style:
