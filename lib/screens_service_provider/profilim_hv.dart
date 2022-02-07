@@ -6,13 +6,14 @@ import 'package:ustasi_yapsin/external_widgets/BottomNavigationBar_hv.dart';
 import 'package:http/http.dart' as http;
 
 String username = '';
-  String name = '';
-  String surname = '';
-  String adress = '';
-  String gsm = '';
-  String userId = '';
-  String responses = '';
-  String mail = '';
+String name = '';
+String surname = '';
+String adress = '';
+String gsm = '';
+String userId = '';
+String responses = '';
+String mail = '';
+
 class Profil extends StatelessWidget {
   const Profil({Key? key}) : super(key: key);
 
@@ -28,8 +29,8 @@ class Profil extends StatelessWidget {
           right: true,
           child: SingleChildScrollView(
               child: Stack(
-                children: [Profilim()],
-              )),
+            children: [Profilim()],
+          )),
         ),
         bottomNavigationBar: NavigationBottom(),
       ),
@@ -45,7 +46,6 @@ class Profilim extends StatefulWidget {
 }
 
 class _ProfilimState extends State<Profilim> {
-
   final _formKey = GlobalKey<FormState>();
   bool _passwordVisible = true;
   var isLoader = false;
@@ -63,38 +63,38 @@ class _ProfilimState extends State<Profilim> {
 
     print(userId + username + name);
   }
-   final nameController = TextEditingController(text:name);
-  final mailController = TextEditingController(text:username);
-  final gsmController = TextEditingController(text:gsm);
+
+  final nameController = TextEditingController(text: name);
+  final mailController = TextEditingController(text: username);
+  final gsmController = TextEditingController(text: gsm);
 
   Future<String> login(String mail, String gsm, String name) async {
     setState(() {
       isLoader = true;
     });
-  final response = await http.put(
-    Uri.parse('https://ustasiyapsin-api.herokuapp.com/api/user/'+userId),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    },
-    body: jsonEncode(
-        <String, String>{'gsm': mail, 'mail': mail, 'name': name}),
-  );
+    final response = await http.put(
+      Uri.parse('https://ustasiyapsin-api.herokuapp.com/api/user/' + userId),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body:
+          jsonEncode(<String, String>{'gsm': mail, 'mail': mail, 'name': name}),
+    );
 
-  if (response.statusCode == 201) {
-    print(response.statusCode);
-    setState(() {
+    if (response.statusCode == 201) {
+      print(response.statusCode);
+      setState(() {
         responses = '201';
-    });
-  
-    isLoader = false;
-    return '201';
+        isLoader = false;
+      });
 
-  } else {
-    isLoader = false;
-    return '500';
-    throw Exception();
+      return '201';
+    } else {
+      isLoader = false;
+      return '500';
+      throw Exception();
+    }
   }
-}
 
   @override
   void initState() {
@@ -102,242 +102,249 @@ class _ProfilimState extends State<Profilim> {
     // TODO: implement initState
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width,
-      child:  isLoader
+        width: MediaQuery.of(context).size.width,
+        child: isLoader
             ? Padding(
                 padding: const EdgeInsets.fromLTRB(0, 350, 0, 0),
                 child: Column(
                   children: [
                     Center(child: CircularProgressIndicator()),
-                    Center(child:Padding(
+                    Center(
+                        child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text('Güncelleme Yapılıyor...', style:TextStyle(fontSize:18, fontWeight: FontWeight.bold),),
+                      child: Text(
+                        'Güncelleme Yapılıyor...',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
                     ))
                   ],
                 ),
               )
-           :Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SingleChildScrollView(
-              child: Stack(
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: 150,
-                            height: 150,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  gradient: LinearGradient(
-                                      colors: [
-                                        Colors.white,
-                                        Colors.deepPurple,
-                                      ],
-                                      begin: Alignment.bottomLeft,
-                                      end: Alignment.topRight
-                                  )
-                              ),
-                              child: CircleAvatar(
-                                radius: 30.0,
-                                /*backgroundImage:
+                  SingleChildScrollView(
+                      child: Stack(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 150,
+                                height: 150,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: LinearGradient(
+                                          colors: [
+                                            Colors.white,
+                                            Colors.deepPurple,
+                                          ],
+                                          begin: Alignment.bottomLeft,
+                                          end: Alignment.topRight)),
+                                  child: CircleAvatar(
+                                    radius: 30.0,
+                                    /*backgroundImage:
                                       AssetImage('assets/ikon8.png'),*/
-                                backgroundColor: Colors.transparent,
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width,
-                            child: Container(
-                              child: Center(
-                                child: Stack(children: [
-                                  Text(
-                                    name,
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold),
+                                    backgroundColor: Colors.transparent,
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.fromLTRB(40, 20, 0, 0),
-                                    child: Text(
-                                      '',
-                                      style: TextStyle(
-                                          color:Colors.grey.shade500,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  )
-                                ]),
+                                ),
                               ),
-                              height: 140.0,
-                              width: MediaQuery.of(context).size.width - 100.0,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  color: Colors.white,
-                                  image: DecorationImage(
-                                      image: new AssetImage(
-                                          "assets/hesabim_kusak.png"),
-                                      fit: BoxFit.fill)),
-                            ),
-                          )
-                        ],
-                      ),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                                child: Container(
+                                  child: Center(
+                                    child: Stack(children: [
+                                      Text(
+                                        name,
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                            40, 0, 0, 0),
+                                        child: Text(
+                                          '',
+                                          style: TextStyle(
+                                              color: Colors.grey.shade500,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      )
+                                    ]),
+                                  ),
+                                  height: 140.0,
+                                  width:
+                                      MediaQuery.of(context).size.width - 100.0,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5),
+                                      color: Colors.white,
+                                      image: DecorationImage(
+                                          image: new AssetImage(
+                                              "assets/hesabim_kusak.png"),
+                                          fit: BoxFit.fill)),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  )),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(40, 0, 0, 0),
+                          child: Icon(
+                            Icons.person,
+                            color: Colors.grey,
+                            size: 23,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                          child: TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Profil()),
+                                );
+                              },
+                              child: Text('Profilim',
+                                  style: TextStyle(
+                                      color: Colors.grey.shade500,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16))),
+                        )
+                      ],
                     ),
-                  )
-                ],
-              )),
-          SizedBox(
-            width:MediaQuery.of(context).size.width,
-            child:Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(40, 0, 0, 0),
-                  child: Icon(
-                    Icons.person,
-                    color: Colors.grey,
-                    size: 23,
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                  child: TextButton(onPressed: (){
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Profil()),
-                    );
-                  }, child: Text('Profilim', style:TextStyle(color:Colors.grey.shade500, fontWeight: FontWeight.bold, fontSize: 16))),
-                )
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
-            child: TextFormField(
-              controller:nameController,
-              enableSuggestions: false,
-              autocorrect: false,
-              // The validator receives the text that the user has entered.
-              decoration: InputDecoration(
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
+                    child: TextFormField(
+                      controller: nameController,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      // The validator receives the text that the user has entered.
+                      decoration: InputDecoration(
+                          focusColor: Colors.deepPurple,
+                          hintText: 'Adınız ve Soyadınız',
+                          hintStyle: TextStyle(fontSize: 12)),
 
-                  focusColor: Colors.deepPurple,
-                  hintText: 'Adınız ve Soyadınız',
-                  hintStyle: TextStyle(fontSize: 12)
-              ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Ad-Soyad Boş Geçilemez!';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
+                    child: TextFormField(
+                      controller: mailController,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      // The validator receives the text that the user has entered.
+                      decoration: InputDecoration(
+                          focusColor: Colors.deepPurple,
+                          hintText: 'Mail adresiniz',
+                          hintStyle: TextStyle(fontSize: 12)),
 
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Ad-Soyad Boş Geçilemez!';
-                }
-                return null;
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
-            child: TextFormField(
-              controller:mailController,
-              enableSuggestions: false,
-              autocorrect: false,
-              // The validator receives the text that the user has entered.
-              decoration: InputDecoration(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Mail Boş Geçilemez!';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
+                    child: TextFormField(
+                      controller: gsmController,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      // The validator receives the text that the user has entered.
+                      decoration: InputDecoration(
+                          focusColor: Colors.deepPurple,
+                          hintText: 'Gsm Numaranız +90',
+                          hintStyle: TextStyle(fontSize: 12)),
 
-                focusColor: Colors.deepPurple,
-                hintText: 'Mail adresiniz',
-                hintStyle: TextStyle(fontSize: 12)
-              ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Gsm Boş Geçilemez!';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
+                    child: TextFormField(
+                      obscureText: _passwordVisible,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      // The validator receives the text that the user has entered.
+                      decoration: InputDecoration(
+                          focusColor: Colors.deepPurple,
+                          hintText: 'Şifre oluşturun',
+                          hintStyle: TextStyle(fontSize: 12)),
 
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Mail Boş Geçilemez!';
-                }
-                return null;
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
-            child: TextFormField(
-              controller:gsmController,
-              enableSuggestions: false,
-              autocorrect: false,
-              // The validator receives the text that the user has entered.
-              decoration: InputDecoration(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Şifre Boş Geçilemez!';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(40, 0, 40, 15),
+                    child: TextFormField(
+                      obscureText: _passwordVisible,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      // The validator receives the text that the user has entered.
+                      decoration: InputDecoration(
+                          focusColor: Colors.deepPurple,
+                          hintText: 'Şifrenizi tekrar girin',
+                          hintStyle: TextStyle(fontSize: 12)),
 
-                  focusColor: Colors.deepPurple,
-                  hintText: 'Gsm Numaranız +90',
-                  hintStyle: TextStyle(fontSize: 12)
-              ),
-
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Gsm Boş Geçilemez!';
-                }
-                return null;
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
-            child: TextFormField(
-              obscureText: _passwordVisible,
-              enableSuggestions: false,
-              autocorrect: false,
-              // The validator receives the text that the user has entered.
-              decoration: InputDecoration(
-
-                  focusColor: Colors.deepPurple,
-                  hintText: 'Şifre oluşturun',
-                  hintStyle: TextStyle(fontSize: 12)
-              ),
-
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Şifre Boş Geçilemez!';
-                }
-                return null;
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(40, 0, 40, 15),
-            child: TextFormField(
-              obscureText: _passwordVisible,
-              enableSuggestions: false,
-              autocorrect: false,
-              // The validator receives the text that the user has entered.
-              decoration: InputDecoration(
-
-                  focusColor: Colors.deepPurple,
-                  hintText: 'Şifrenizi tekrar girin',
-                  hintStyle: TextStyle(fontSize: 12)
-              ),
-
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Şifre Boş Geçilemez!';
-                }
-                return null;
-              },
-            ),
-          ),
-          SizedBox(
-            width: 180,
-            child:FlatButton(color:Colors.deepPurple, onPressed: (){
-               login(mailController.text, gsmController.text, nameController.text);
-            }, child: Text('Güncelle', style:TextStyle(color:Colors.white)),)
-          )
-        ],
-      )
-    );
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Şifre Boş Geçilemez!';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                      width: 180,
+                      child: FlatButton(
+                        color: Colors.deepPurple,
+                        onPressed: () {
+                          login(mailController.text, gsmController.text,
+                              nameController.text);
+                        },
+                        child: Text('Güncelle',
+                            style: TextStyle(color: Colors.white)),
+                      ))
+                ],
+              ));
   }
 }
