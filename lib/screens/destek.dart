@@ -114,7 +114,7 @@ class _DesteklemeState extends State<Destekleme> {
                               child: Center(
                                 child: Stack(children: [
                                   Text(
-                                    'Mustafa Müşteri',
+                                    'Whatsapp Destek',
                                     style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold),
@@ -122,7 +122,7 @@ class _DesteklemeState extends State<Destekleme> {
                                   Padding(
                                     padding: const EdgeInsets.fromLTRB(40, 20, 0, 0),
                                     child: Text(
-                                      'Denizli',
+                                      '',
                                       style: TextStyle(
                                           color:Colors.grey.shade500,
                                           fontSize: 12,

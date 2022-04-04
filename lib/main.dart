@@ -27,11 +27,16 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage("assets/splashscreen.jpeg"),
-                fit: BoxFit.fill)),
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 70, 20, 70),
+        child: Container(
+
+          decoration: BoxDecoration(
+            color:Colors.white,
+              image: DecorationImage(
+                  image: AssetImage("assets/acılıs.png"),
+                  fit: BoxFit.fill)),
+        ),
       ),
     );
   }

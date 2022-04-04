@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ustasi_yapsin/external_widgets/BottomNavigationBar1.dart';
+import 'package:ustasi_yapsin/external_widgets/BottomNavigationBar_hv.dart';
+
 
 class Adreslerim extends StatelessWidget {
   const Adreslerim({Key? key}) : super(key: key);
@@ -79,7 +80,7 @@ class _AdresIcerikState extends State<AdresIcerik> {
                                 child: Center(
                                   child: Stack(children: [
                                     Text(
-                                      'Ahmet Boyacı',
+                                      'Adreslerim',
                                       style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold),
@@ -87,7 +88,7 @@ class _AdresIcerikState extends State<AdresIcerik> {
                                     Padding(
                                       padding: const EdgeInsets.fromLTRB(40, 20, 0, 0),
                                       child: Text(
-                                        'Denizli',
+                                        '',
                                         style: TextStyle(
                                             color:Colors.grey.shade500,
                                             fontSize: 12,

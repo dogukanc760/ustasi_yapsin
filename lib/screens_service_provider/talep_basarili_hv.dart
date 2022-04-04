@@ -65,7 +65,7 @@ class IslemBasarili extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => TekliflerimHv()),
+                MaterialPageRoute(builder: (context) => AnasayfaHizmet()),
               );
             },
             child: const Text('Diğer Teklif bekleyen işleri gör'),

@@ -1,14 +1,18 @@
 import 'dart:convert';
 
 import 'package:carousel_slider/carousel_controller.dart';
-import 'package:http/http.dart' as http;
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:ustasi_yapsin/external_widgets/BottomNavigationBar1.dart';
 import 'package:ustasi_yapsin/models/category.dart';
+import 'package:ustasi_yapsin/models/sector.dart';
 import 'package:ustasi_yapsin/models/service.dart';
+import 'package:ustasi_yapsin/screens/hizmetkarsilama.dart';
+import 'package:ustasi_yapsin/screens/profilim.dart';
 
 final List<String> categoryList = [
   '',
@@ -49,6 +53,9 @@ List<Category> categoryListe = [];
 List<Slider> sliderListe = [];
 List<Service> serviceListe = [];
 final List<String> imgList = [];
+List<String> sectorsSt = [];
+List<Sector> sectors = [];
+int dataCount = 0;
 Future<Category> getCategory() async {
   final response = await http.get(
     Uri.parse('https://ustasiyapsin-api.herokuapp.com/api/category'),
@@ -81,7 +88,6 @@ class _AnasayfaState extends State<Anasayfa> {
   List<Category> categoryListesi = [];
   var isLoading = false;
   Future<List<Category>> veriAl() async {
-   
     final response = await http.get(
       Uri.parse('https://ustasiyapsin-api.herokuapp.com/api/category'),
     );
@@ -112,8 +118,8 @@ class _AnasayfaState extends State<Anasayfa> {
   @override
   void initState() {
     // TODO: implement initState
-    
-    veriAl();
+
+    //  veriAl();
     super.initState();
   }
 
@@ -128,9 +134,10 @@ class _AnasayfaState extends State<Anasayfa> {
           left: true,
           right: true,
           child: SingleChildScrollView(
-              child: Stack(
-            children: [HomePages()],
-          )),
+            child: Stack(
+              children: [HomePages()],
+            ),
+          ),
         ),
         bottomNavigationBar: NavigationBottom(),
       ),
@@ -158,9 +165,10 @@ class _HomePagesState extends State<HomePages> {
 
     if (response.statusCode == 200) {
       var result = jsonDecode(response.body);
+      print(result['data'].length.toString() + "uzunluk");
       //  print(result['data'][0]['_id'])
       setState(() {
-        for (var i = 0; i < result.length; i++) {
+        for (var i = 0; i < result['data'].length; i++) {
           print(result['data'][i]);
 
           categoryListe.add(Category(
@@ -169,10 +177,10 @@ class _HomePagesState extends State<HomePages> {
               isActive: result['data'][i]['isActive'],
               showHome: result['data'][i]['showHome'],
               id: result['data'][i]['_id']));
-          print(categoryListe[i].name);
+          // print(categoryListe[i].name);
         }
-       
       });
+
       return categoryListe;
     } else {
       throw Exception();
@@ -189,11 +197,12 @@ class _HomePagesState extends State<HomePages> {
 
     if (response.statusCode == 200) {
       var result = jsonDecode(response.body);
+      // print(result['data']);
       //  print(result['data'][0]['_id'])
       setState(() {
         for (var i = 0; i < result.length; i++) {
           print(result['data'][i]);
-          imgList.add("https://showmarket-api.herokuapp.com/images/" +
+          imgList.add("https://ustasiyapsin-api.herokuapp.com/images/" +
               result['data'][i]['sliderUrl']);
         }
       });
@@ -202,7 +211,8 @@ class _HomePagesState extends State<HomePages> {
       throw Exception();
     }
   }
-Future<List<Category>> getService() async {
+
+  Future<List<Category>> getService() async {
     setState(() {
       isLoading = true;
     });
@@ -212,26 +222,85 @@ Future<List<Category>> getService() async {
 
     if (response.statusCode == 200) {
       var result = jsonDecode(response.body);
-      //  print(result['data'][0]['_id'])
+      // print(result['data']);
       setState(() {
-        for (var i = 0; i < result.length; i++) {
-          serviceListe.add(Service(user: result['data'][i]['user'], name: result['data'][i]['name'],
-           companyName: result['data'][i]['companyName'], sector: result['data'][i]['sector'].cast<String>(), 
-          category: result['data'][i]['category'].cast<String>(), city: result['data'][i]['city'].cast<String>(),
-           distinct: result['data'][i]['distinct'].cast<String>(), questions: result['data'][i]['questions'].cast<String>(),
-            answer: result['data'][i]['answer'].cast<String>(), 
-          title: result['data'][i]['title'], description: result['data'][i]['description'],
-           price: result['data'][i]['price'], priceTwo: result['data'][i]['priceTwo'], personCount: result['data'][i]['personCount'],
-           img: result['data'][i]['img'], descImg: result['data'][i]['descImg'].cast<String>(),
-            descVideos: result['data'][i]['descVideos'].cast<String>(),
-            rating: result['data'][i]['rating'], ratingCount: result['data'][i]['ratingCount'],
-            about: result['data'][i]['about'], comments: result['data'][i]['comments'].cast<String>()));
+        if (result.length > 1) {
+          for (var i = 0; i < result['data'].length; i++) {
+            serviceListe.add(Service(
+                user: result['data'][i]['user'],
+                name: result['data'][i]['name'],
+                companyName: result['data'][i]['companyName'],
+                sector: result['data'][i]['sector'].cast<String>(),
+                category: result['data'][i]['category'].cast<String>(),
+                city: result['data'][i]['city'].cast<String>(),
+                distinct: result['data'][i]['distinct'].cast<String>(),
+                questions: result['data'][i]['questions'].cast<String>(),
+                answer: result['data'][i]['answer'].cast<String>(),
+                title: result['data'][i]['title'],
+                description: result['data'][i]['description'],
+                price: result['data'][i]['price'],
+                priceTwo: result['data'][i]['priceTwo'],
+                personCount: result['data'][i]['personCount'],
+                img: result['data'][i]['img'],
+                descImg: result['data'][i]['descImg'].cast<String>(),
+                descVideos: result['data'][i]['descVideos'].cast<String>(),
+                rating: result['data'][i]['rating'],
+                ratingCount: result['data'][i]['ratingCount'],
+                about: result['data'][i]['about'],
+                comments: result['data'][i]['comments'].cast<String>()));
+          }
         }
-        print(serviceListe[0].name);
-         isLoading = false;
+
+        // print(serviceListe[0].name);
+        isLoading = false;
+        dataCount = serviceListe.length;
       });
       return categoryListe;
     } else {
+      setState(() {
+        dataCount = 0;
+        isLoading = false;
+      });
+      throw Exception();
+    }
+  }
+
+  Future<void> getSector(String categoryName) async {
+    setState(() {
+      isLoading = true;
+    });
+    final response = await http.get(
+      Uri.parse('https://ustasiyapsin-api.herokuapp.com/api/sector/'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print(response.statusCode);
+
+      var result = jsonDecode(response.body);
+      print('sektör');
+      print(result['data']);
+      //  print(result['data'][0]['_id']);
+      if (result['data'].length > 0) {
+        setState(() {
+          for (var i = 0; i < result['data'].length - 1; i++) {
+            sectors.add(Sector(
+                category: result['data'][i]['category'].cast<String>(),
+                name: result['data'][i]['name'],
+                id: result['data'][i]['_id']));
+            sectorsSt.add(result['data'][i]['name']);
+          }
+        });
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } else {
+      setState(() {
+        isLoading = false;
+      });
       throw Exception();
     }
   }
@@ -241,11 +310,11 @@ Future<List<Category>> getService() async {
     categoryListe.clear();
     serviceListe.clear();
     getSession();
-     veriAl();
-    
+    veriAl();
+    getSector('');
     // TODO: implement initState
     getSlider();
-   getService();
+    getService();
     super.initState();
   }
 
@@ -259,10 +328,26 @@ Future<List<Category>> getService() async {
       gsm = prefs.getString('gsm').toString();
       userId = prefs.getString('id').toString();
       adress = prefs.getString('adress').toString();
-      
+      if (adress.length < 3) {
+        adress = '';
+      }
     });
 
     print(userId + username + name);
+  }
+
+  void openWebSite() async {
+    const url = "https://uzmanabak.com/";
+    try {
+      await launch(url);
+    } catch (e) {
+      throw "Could not launch $url";
+    }
+    // if (await canLaunch(url))
+    //   await launch(url);
+    // else
+    //   // can't launch url, there is some error
+    //   throw "Could not launch $url";
   }
 
   @override
@@ -278,8 +363,10 @@ Future<List<Category>> getService() async {
                   Center(
                       child: Container(
                           child: TextButton(
-                              onPressed: () {},
-                              child: Text('UzmanıBaksın.com',
+                              onPressed: () {
+                                openWebSite();
+                              },
+                              child: Text('UzmanaBak.com',
                                   style: TextStyle(color: Colors.purple))))),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(30, 0, 30, 30),
@@ -352,12 +439,17 @@ Future<List<Category>> getService() async {
                             children: [
                               Container(
                                 padding: EdgeInsets.fromLTRB(10, 20, 0, 0),
-                                child: Text(
-                                  'Hoşgeldin ' + name,
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold),
-                                ),
+                                child: name.length < 5
+                                    ? Text('Hoşgeldiniz.',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold))
+                                    : Text(
+                                        'Hoşgeldin ' + name,
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold),
+                                      ),
                               ),
                               Container(
                                 width: 220,
@@ -382,15 +474,21 @@ Future<List<Category>> getService() async {
                                               color: Colors.white,
                                             ),
                                           )),
-                                          TextSpan(
-                                              text: adress[0])
+                                          //adress
+                                          TextSpan(text: '')
                                         ],
                                       ),
                                     ),
                                     Container(
                                       padding: EdgeInsets.fromLTRB(2, 4, 0, 0),
                                       child: TextButton(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => Profil()),
+                                          );
+                                        },
                                         child: Text('Değiştir',
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold,
@@ -432,68 +530,110 @@ Future<List<Category>> getService() async {
                       child: RichText(
                         text: TextSpan(children: [
                           TextSpan(
-                              text: "Daha fazlasını Keşfet ",
+                              text: " ",
                               style: TextStyle(
                                 color: Colors.blueAccent,
                               )),
                           WidgetSpan(
-                            child: Icon(Icons.arrow_forward_rounded, size: 14),
+                            child: Icon(Icons.arrow_forward_rounded,
+                                size: 14, color: Colors.white),
                           ),
                         ]),
                       ),
                     ),
                   ),
+
                   Row(children: [
                     Expanded(
-                      child: Center(
-                        child: SizedBox(
-                          height: 130,
-                          width: MediaQuery.of(context).size.width,
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            scrollDirection: Axis.horizontal,
-                            itemCount: categoryListe.length,
-                            itemBuilder: (BuildContext context, int index) =>
-                                Card(
-                              elevation: 0,
-                              child: Center(
-                                  child: Padding(
-                                padding: const EdgeInsets.only(left: 15),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(top: 10),
-                                  child: Column(
-                                    children: [
-                                      Card(
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(90.0),
-                                            side: BorderSide(
-                                                width: 3, color: Colors.blue)),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(5.0),
-                                          child: Image.network(
-                                            'https://ustasiyapsin-api.herokuapp.com/images/' +
-                                                categoryListe[index].img,
-                                            height: 70,
-                                            width: 70,
-                                            fit: BoxFit.fill,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(20, 5, 0, 0),
+                            child: Text('Sektörler',
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18)),
+                          ),
+                          Center(
+                            child: SizedBox(
+                              height: 130,
+                              width: MediaQuery.of(context).size.width,
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                scrollDirection: Axis.horizontal,
+                                itemCount: categoryListe.length,
+                                itemBuilder:
+                                    (BuildContext context, int index) => Card(
+                                  elevation: 0,
+                                  child: Center(
+                                      child: Padding(
+                                    padding: const EdgeInsets.only(left: 15),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 10),
+                                      child: Column(
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          HizmetKarsilama(
+                                                            categoryId:
+                                                                categoryListe[
+                                                                        index]
+                                                                    .id,
+                                                            categoryName:
+                                                                categoryListe[
+                                                                        index]
+                                                                    .name,
+                                                            categoryImg:
+                                                                categoryListe[
+                                                                        index]
+                                                                    .img,
+                                                          )));
+                                            },
+                                            child: Card(
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          90.0),
+                                                  side: BorderSide(
+                                                      width: 3,
+                                                      color: Colors.blue)),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(5.0),
+                                                child: Image.network(
+                                                  'https://ustasiyapsin-api.herokuapp.com/images/' +
+                                                      categoryListe[index].img,
+                                                  height: 70,
+                                                  width: 70,
+                                                  fit: BoxFit.fill,
+                                                ),
+                                              ),
+                                            ),
                                           ),
-                                        ),
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 5),
+                                            child: Text(
+                                              categoryListe[index].name,
+                                              style: TextStyle(fontSize: 10),
+                                            ),
+                                          )
+                                        ],
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 5),
-                                        child: Text(
-                                          categoryListe[index].name,
-                                          style: TextStyle(fontSize: 10),
-                                        ),
-                                      )
-                                    ],
-                                  ),
+                                    ),
+                                  )),
                                 ),
-                              )),
+                              ),
                             ),
                           ),
-                        ),
+                        ],
                       ),
                     ),
                   ]),
@@ -510,7 +650,7 @@ Future<List<Category>> getService() async {
                             Padding(
                               padding: const EdgeInsets.fromLTRB(25, 10, 0, 10),
                               child: Text(
-                                'Acil Hizmetler',
+                                'Kategoriler',
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold, fontSize: 16),
                                 textAlign: TextAlign.start,
@@ -537,24 +677,46 @@ Future<List<Category>> getService() async {
                                               SizedBox(
                                                 width: 5,
                                               ),
-                                              Card(
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            90.0),
-                                                    side: BorderSide(
-                                                        width: 3,
-                                                        color: Colors.blue)),
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(4),
-                                                  child: Image.network(
-                                                    'https://ustasiyapsin-api.herokuapp.com/images/' +
-                                                        categoryListe[index]
-                                                            .img,
-                                                    height: 50,
-                                                    width: 50,
-                                                    fit: BoxFit.fill,
+                                              GestureDetector(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              HizmetKarsilama(
+                                                                categoryId:
+                                                                    categoryListe[
+                                                                            index]
+                                                                        .id,
+                                                                categoryName:
+                                                                    categoryListe[
+                                                                            index]
+                                                                        .name,
+                                                                categoryImg:
+                                                                    categoryListe[
+                                                                            index]
+                                                                        .img,
+                                                              )));
+                                                },
+                                                child: Card(
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              90.0),
+                                                      side: BorderSide(
+                                                          width: 3,
+                                                          color: Colors.blue)),
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(4),
+                                                    child: Image.network(
+                                                      'https://ustasiyapsin-api.herokuapp.com/images/' +
+                                                          categoryListe[index]
+                                                              .img,
+                                                      height: 50,
+                                                      width: 50,
+                                                      fit: BoxFit.fill,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -599,13 +761,89 @@ Future<List<Category>> getService() async {
                                 textAlign: TextAlign.start,
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                              child: Image(
-                                image: AssetImage('assets/anasayfaslider2.jpg'),
-                                width: MediaQuery.of(context).size.width,
+                            SizedBox(
+                              height: 250,
+                              width: MediaQuery.of(context).size.width,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 15),
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: categoryListe.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) => Card(
+                                    elevation: 0,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 10),
+                                      child: Row(
+                                        children: [
+                                          Column(
+                                            children: [
+                                              SizedBox(
+                                                width: 5,
+                                              ),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              HizmetKarsilama(
+                                                                categoryId:
+                                                                    categoryListe[
+                                                                            index]
+                                                                        .id,
+                                                                categoryName:
+                                                                    categoryListe[
+                                                                            index]
+                                                                        .name,
+                                                                categoryImg:
+                                                                    categoryListe[
+                                                                            index]
+                                                                        .img,
+                                                              )));
+                                                },
+                                                child: Card(
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              90.0),
+                                                      side: BorderSide(
+                                                          width: 3,
+                                                          color: Colors.blue)),
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(4),
+                                                    child: Image.network(
+                                                      'https://ustasiyapsin-api.herokuapp.com/images/' +
+                                                          categoryListe[index]
+                                                              .img,
+                                                      height: 170,
+                                                      width: 170,
+                                                      fit: BoxFit.fill,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        0, 0, 0, 10),
+                                                child: Text(
+                                                  categoryListe[index].name,
+                                                  style:
+                                                      TextStyle(fontSize: 10),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
-                            )
+                            ),
                           ],
                         )),
                   ),
@@ -635,182 +873,190 @@ Future<List<Category>> getService() async {
                             children: [
                               Padding(
                                 padding: const EdgeInsets.all(10.0),
-                                child: Text(
-                                  'Eğitim',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14),
-                                  textAlign: TextAlign.start,
-                                ),
+                                child: dataCount < 12
+                                    ? Text(
+                                        'Tüm Hizmetlerimiz Çok Yakında Sizlerle!',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14),
+                                        textAlign: TextAlign.start,
+                                      )
+                                    : Text(
+                                        'Eğitim',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14),
+                                        textAlign: TextAlign.start,
+                                      ),
                               ),
                               SizedBox(
-                                height: 320,
+                                height: dataCount < 12 ? 50 : 320,
                                 width: MediaQuery.of(context).size.width,
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: serviceListe.length,
-                                  itemBuilder:
-                                      (BuildContext context, int index) => Card(
-                                    elevation: 0,
-                                    child: Center(
-                                        child: Padding(
-                                      padding: const EdgeInsets.only(left: 15),
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(top: 10),
-                                        child: Column(
-                                          children: [
-                                            Card(
+                                child: dataCount < 12
+                                    ? Center(
+                                        child: Container(
+                                        height: 150,
+                                        child: Text(
+                                            'Hizmetlerimiz Çok Yakında...',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 20)),
+                                      ))
+                                    : ListView.builder(
+                                        shrinkWrap: true,
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: serviceListe.length,
+                                        itemBuilder:
+                                            (BuildContext context, int index) =>
+                                                Card(
+                                          elevation: 0,
+                                          child: Center(
+                                              child: Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 15),
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 10),
                                               child: Column(
                                                 children: [
-                                                  Row(
-                                                    children: [
-                                                      Container(
-                                                        width: 150,
-                                                        height: 240,
-                                                        color: Colors.white,
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
+                                                  Card(
+                                                    child: Column(
+                                                      children: [
+                                                        Row(
                                                           children: [
-                                                            Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                              .fromLTRB(
-                                                                          20,
-                                                                          0,
-                                                                          0,
-                                                                          0),
-                                                                  child: Text(
-                                                                    serviceListe[index].name,
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            11),
-                                                                    textAlign:
-                                                                        TextAlign
+                                                            Container(
+                                                              width: 150,
+                                                              height: 240,
+                                                              color:
+                                                                  Colors.white,
+                                                              child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
                                                                             .start,
-                                                                  ),
-                                                                ),
-                                                                Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                              .fromLTRB(
-                                                                          10,
-                                                                          0,
-                                                                          0,
-                                                                          0),
-                                                                  child: SizedBox(
-                                                                      width:
-                                                                          180,
-                                                                      height:
-                                                                          150,
-                                                                      child: Image(
-                                                                          image:
-                                                                              NetworkImage(
-                                                                                'https://ustasiyapsin-api.herokuapp.com/images/'
-                                                                                +serviceListe[index].img))),
-                                                                ),
-                                                                Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                              .fromLTRB(
-                                                                          30,
-                                                                          0,
-                                                                          0,
-                                                                          0),
-                                                                  child: Text(
-                                                                    'Uzman Eğitmenlerden',
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            11),
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                  ),
-                                                                ),
-                                                                Column(
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .center,
-                                                                  children: [
-                                                                    Center(
-                                                                      child: FlatButton(
-                                                                          shape: RoundedRectangleBorder(
-                                                                              borderRadius: BorderRadius.circular(
-                                                                                  7.0),
-                                                                              side: BorderSide(
-                                                                                  color: Colors
-                                                                                      .deepPurple)),
-                                                                          height:
-                                                                              30,
-                                                                          minWidth:
-                                                                              50,
-                                                                          color: Colors
-                                                                              .deepPurple,
-                                                                          onPressed:
-                                                                              () {},
-                                                                          child: Text(
-                                                                              'Hemen Teklif İste',
-                                                                              style: TextStyle(color: Colors.white, fontSize: 12))),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ],
-                                                            )
+                                                                    children: [
+                                                                      Padding(
+                                                                        padding: const EdgeInsets.fromLTRB(
+                                                                            20,
+                                                                            0,
+                                                                            0,
+                                                                            0),
+                                                                        child:
+                                                                            Text(
+                                                                          serviceListe[index]
+                                                                              .name,
+                                                                          style:
+                                                                              TextStyle(fontSize: 11),
+                                                                          textAlign:
+                                                                              TextAlign.start,
+                                                                        ),
+                                                                      ),
+                                                                      Padding(
+                                                                        padding: const EdgeInsets.fromLTRB(
+                                                                            10,
+                                                                            0,
+                                                                            0,
+                                                                            0),
+                                                                        child: SizedBox(
+                                                                            width:
+                                                                                180,
+                                                                            height:
+                                                                                150,
+                                                                            child:
+                                                                                Image(image: NetworkImage('https://ustasiyapsin-api.herokuapp.com/images/' + serviceListe[index].img))),
+                                                                      ),
+                                                                      Padding(
+                                                                        padding: const EdgeInsets.fromLTRB(
+                                                                            30,
+                                                                            0,
+                                                                            0,
+                                                                            0),
+                                                                        child:
+                                                                            Text(
+                                                                          'Uzman Eğitmenlerden',
+                                                                          style:
+                                                                              TextStyle(fontSize: 11),
+                                                                          textAlign:
+                                                                              TextAlign.center,
+                                                                        ),
+                                                                      ),
+                                                                      Column(
+                                                                        crossAxisAlignment:
+                                                                            CrossAxisAlignment.center,
+                                                                        children: [
+                                                                          Center(
+                                                                            child: FlatButton(
+                                                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0), side: BorderSide(color: Colors.deepPurple)),
+                                                                                height: 30,
+                                                                                minWidth: 50,
+                                                                                color: Colors.deepPurple,
+                                                                                onPressed: () {},
+                                                                                child: Text('Hemen Teklif İste', style: TextStyle(color: Colors.white, fontSize: 12))),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ],
+                                                                  )
+                                                                ],
+                                                              ),
+                                                            ),
                                                           ],
                                                         ),
-                                                      ),
-                                                    ],
+                                                        Container(
+                                                            width: 150,
+                                                            child: RatingBar
+                                                                .builder(
+                                                              initialRating:
+                                                                  3.5,
+                                                              minRating: 1,
+                                                              direction: Axis
+                                                                  .horizontal,
+                                                              allowHalfRating:
+                                                                  true,
+                                                              itemCount: 5,
+                                                              itemSize: 25,
+                                                              itemPadding: EdgeInsets
+                                                                  .symmetric(
+                                                                      horizontal:
+                                                                          2.0),
+                                                              itemBuilder:
+                                                                  (context,
+                                                                          _) =>
+                                                                      Icon(
+                                                                Icons.star,
+                                                                size: 2,
+                                                                color: Colors
+                                                                    .amber,
+                                                              ),
+                                                              onRatingUpdate:
+                                                                  (rating) {
+                                                                print(rating);
+                                                              },
+                                                            ))
+                                                      ],
+                                                    ),
                                                   ),
-                                                  Container(
-                                                      width: 150,
-                                                      child: RatingBar.builder(
-                                                        initialRating: 3.5,
-                                                        minRating: 1,
-                                                        direction:
-                                                            Axis.horizontal,
-                                                        allowHalfRating: true,
-                                                        itemCount: 5,
-                                                        itemSize: 25,
-                                                        itemPadding: EdgeInsets
-                                                            .symmetric(
-                                                                horizontal:
-                                                                    2.0),
-                                                        itemBuilder:
-                                                            (context, _) =>
-                                                                Icon(
-                                                          Icons.star,
-                                                          size: 2,
-                                                          color: Colors.amber,
-                                                        ),
-                                                        onRatingUpdate:
-                                                            (rating) {
-                                                          print(rating);
-                                                        },
-                                                      ))
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 5),
+                                                    child: Text(
+                                                      serviceListe[index]
+                                                          .category[0],
+                                                      style: TextStyle(
+                                                          fontSize: 10),
+                                                    ),
+                                                  )
                                                 ],
                                               ),
                                             ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.only(top: 5),
-                                              child: Text(
-                                                serviceListe[index].category[0],
-                                                style: TextStyle(fontSize: 10),
-                                              ),
-                                            )
-                                          ],
+                                          )),
                                         ),
                                       ),
-                                    )),
-                                  ),
-                                ),
                               ),
                             ],
                           ),
@@ -818,7 +1064,7 @@ Future<List<Category>> getService() async {
                       ),
                     ],
                   ),
-                   Column(
+                  Column(
                     children: [
                       Row(
                         children: [
@@ -826,183 +1072,182 @@ Future<List<Category>> getService() async {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Text(
-                                  'Teknoloji',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14),
-                                  textAlign: TextAlign.start,
-                                ),
-                              ),
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Text(
+                                    'Sektörler',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14),
+                                    textAlign: TextAlign.start,
+                                  )),
                               SizedBox(
-                                height: 320,
+                                height: sectors.length < 1 ? 50 : 225,
                                 width: MediaQuery.of(context).size.width,
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: serviceListe.length,
-                                  itemBuilder:
-                                      (BuildContext context, int index) => Card(
-                                    elevation: 0,
-                                    child: Center(
-                                        child: Padding(
-                                      padding: const EdgeInsets.only(left: 15),
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(top: 10),
-                                        child: Column(
-                                          children: [
-                                            Card(
+                                child: sectors.length < 1
+                                    ? Center(
+                                        child: Container(
+                                        height: 150,
+                                        child: Text('Sektörler Çok Yakında...',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 20)),
+                                      ))
+                                    : ListView.builder(
+                                        shrinkWrap: true,
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: sectors.length,
+                                        itemBuilder:
+                                            (BuildContext context, int index) =>
+                                                Card(
+                                          elevation: 0,
+                                          child: Center(
+                                              child: Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 15),
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 10),
                                               child: Column(
                                                 children: [
-                                                  Row(
-                                                    children: [
-                                                      Container(
-                                                        width: 150,
-                                                        height: 240,
-                                                        color: Colors.white,
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
+                                                  Card(
+                                                    child: Column(
+                                                      children: [
+                                                        Row(
                                                           children: [
-                                                            Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                              .fromLTRB(
-                                                                          20,
-                                                                          0,
-                                                                          0,
-                                                                          0),
-                                                                  child: Text(
-                                                                    serviceListe[index].name,
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            11),
-                                                                    textAlign:
-                                                                        TextAlign
+                                                            Container(
+                                                              width: 150,
+                                                              height: 180,
+                                                              color:
+                                                                  Colors.white,
+                                                              child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
                                                                             .start,
-                                                                  ),
-                                                                ),
-                                                                Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                              .fromLTRB(
-                                                                          10,
-                                                                          0,
-                                                                          0,
-                                                                          0),
-                                                                  child: SizedBox(
-                                                                      width:
-                                                                          180,
-                                                                      height:
-                                                                          150,
-                                                                      child: Image(
-                                                                          image:
-                                                                              NetworkImage(
-                                                                                'https://ustasiyapsin-api.herokuapp.com/images/'
-                                                                                +serviceListe[index].img))),
-                                                                ),
-                                                                Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                              .fromLTRB(
-                                                                          30,
-                                                                          0,
-                                                                          0,
-                                                                          0),
-                                                                  child: Text(
-                                                                    'Uzman Eğitmenlerden',
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            11),
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                  ),
-                                                                ),
-                                                                Column(
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .center,
-                                                                  children: [
-                                                                    Center(
-                                                                      child: FlatButton(
-                                                                          shape: RoundedRectangleBorder(
-                                                                              borderRadius: BorderRadius.circular(
-                                                                                  7.0),
-                                                                              side: BorderSide(
-                                                                                  color: Colors
-                                                                                      .deepPurple)),
-                                                                          height:
-                                                                              30,
-                                                                          minWidth:
-                                                                              50,
-                                                                          color: Colors
-                                                                              .deepPurple,
-                                                                          onPressed:
-                                                                              () {},
-                                                                          child: Text(
-                                                                              'Hemen Teklif İste',
-                                                                              style: TextStyle(color: Colors.white, fontSize: 12))),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ],
-                                                            )
+                                                                    children: [
+                                                                      Padding(
+                                                                        padding: const EdgeInsets.fromLTRB(
+                                                                            20,
+                                                                            0,
+                                                                            0,
+                                                                            0),
+                                                                        child:
+                                                                            Text(
+                                                                          sectors[index]
+                                                                              .name,
+                                                                          style:
+                                                                              TextStyle(fontSize: 11),
+                                                                          textAlign:
+                                                                              TextAlign.start,
+                                                                        ),
+                                                                      ),
+                                                                      Padding(
+                                                                        padding: const EdgeInsets.fromLTRB(
+                                                                            10,
+                                                                            0,
+                                                                            0,
+                                                                            0),
+                                                                        child: SizedBox(
+                                                                            width:
+                                                                                180,
+                                                                            height:
+                                                                                150,
+                                                                            child:
+                                                                                Image(image: NetworkImage('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTCaYFd0SW1zugRl_mgeWpRoQAzZh9C1rFTdA&usqp=CAU'))),
+                                                                      ),
+                                                                      Padding(
+                                                                        padding: const EdgeInsets.fromLTRB(
+                                                                            30,
+                                                                            0,
+                                                                            0,
+                                                                            0),
+                                                                        child:
+                                                                            Text(
+                                                                          '',
+                                                                          style:
+                                                                              TextStyle(fontSize: 11),
+                                                                          textAlign:
+                                                                              TextAlign.center,
+                                                                        ),
+                                                                      ),
+                                                                      // Column(
+                                                                      //   crossAxisAlignment:
+                                                                      //       CrossAxisAlignment.center,
+                                                                      //   children: [
+                                                                      //     Center(
+                                                                      //       child: FlatButton(
+                                                                      //           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0), side: BorderSide(color: Colors.deepPurple)),
+                                                                      //           height: 30,
+                                                                      //           minWidth: 50,
+                                                                      //           color: Colors.deepPurple,
+                                                                      //           onPressed: () {},
+                                                                      //           child: Text('Hemen Teklif İste', style: TextStyle(color: Colors.white, fontSize: 12))),
+                                                                      //     ),
+                                                                      //   ],
+                                                                      // ),
+                                                                    ],
+                                                                  )
+                                                                ],
+                                                              ),
+                                                            ),
                                                           ],
                                                         ),
-                                                      ),
-                                                    ],
+                                                        // Container(
+                                                        //     width: 150,
+                                                        //     child: RatingBar
+                                                        //         .builder(
+                                                        //       initialRating:
+                                                        //           3.5,
+                                                        //       minRating: 1,
+                                                        //       direction: Axis
+                                                        //           .horizontal,
+                                                        //       allowHalfRating:
+                                                        //           true,
+                                                        //       itemCount: 5,
+                                                        //       itemSize: 25,
+                                                        //       itemPadding: EdgeInsets
+                                                        //           .symmetric(
+                                                        //               horizontal:
+                                                        //                   2.0),
+                                                        //       itemBuilder:
+                                                        //           (context,
+                                                        //                   _) =>
+                                                        //               Icon(
+                                                        //         Icons.star,
+                                                        //         size: 2,
+                                                        //         color: Colors
+                                                        //             .amber,
+                                                        //       ),
+                                                        //       onRatingUpdate:
+                                                        //           (rating) {
+                                                        //         print(rating);
+                                                        //       },
+                                                        //     ))
+                                                      ],
+                                                    ),
                                                   ),
-                                                  Container(
-                                                      width: 150,
-                                                      child: RatingBar.builder(
-                                                        initialRating: 3.5,
-                                                        minRating: 1,
-                                                        direction:
-                                                            Axis.horizontal,
-                                                        allowHalfRating: true,
-                                                        itemCount: 5,
-                                                        itemSize: 25,
-                                                        itemPadding: EdgeInsets
-                                                            .symmetric(
-                                                                horizontal:
-                                                                    2.0),
-                                                        itemBuilder:
-                                                            (context, _) =>
-                                                                Icon(
-                                                          Icons.star,
-                                                          size: 2,
-                                                          color: Colors.amber,
-                                                        ),
-                                                        onRatingUpdate:
-                                                            (rating) {
-                                                          print(rating);
-                                                        },
-                                                      ))
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 5),
+                                                    child: Text(
+                                                      sectors[index]
+                                                          .category[0]
+                                                          .toString(),
+                                                      style: TextStyle(
+                                                          fontSize: 10),
+                                                    ),
+                                                  )
                                                 ],
                                               ),
                                             ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.only(top: 5),
-                                              child: Text(
-                                                serviceListe[index].category[0],
-                                                style: TextStyle(fontSize: 10),
-                                              ),
-                                            )
-                                          ],
+                                          )),
                                         ),
                                       ),
-                                    )),
-                                  ),
-                                ),
                               ),
                             ],
                           ),
@@ -1010,8 +1255,7 @@ Future<List<Category>> getService() async {
                       ),
                     ],
                   ),
-                 
-                 ],
+                ],
               ));
   }
 }
@@ -1025,12 +1269,13 @@ class ImageSliderDemo extends StatelessWidget {
         options: CarouselOptions(
           autoPlay: true,
           enlargeCenterPage: true,
-          aspectRatio: 2.0,
+          aspectRatio: 2.3,
         ),
         items: imgList
             .map((item) => Container(
                   child: Center(
-                      child: Image.network(item, fit: BoxFit.fill, width: 1000)),
+                      child: Image.network(item,
+                          fit: BoxFit.contain, width: 1920)),
                 ))
             .toList(),
       )),
@@ -1052,7 +1297,8 @@ class ImageSliderDemo_2 extends StatelessWidget {
         items: imgList
             .map((item) => Container(
                   child: Center(
-                      child: Image.network(item, fit: BoxFit.fill, width: 1000)),
+                      child:
+                          Image.network(item, fit: BoxFit.fill, width: 1000)),
                 ))
             .toList(),
       )),

@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:ustasi_yapsin/screens/anasayfa.dart';
 import 'package:ustasi_yapsin/screens/hesabim.dart';
+import 'package:ustasi_yapsin/screens/hizmetAlanMesaj.dart';
 import 'package:ustasi_yapsin/screens/kategoriler.dart';
 import 'package:ustasi_yapsin/screens/taleplerim.dart';
 
@@ -43,7 +44,10 @@ class _NavigationBottomState extends State<NavigationBottom> {
         MaterialPageRoute(builder: (context) => Taleplerim()),
       );
     } else if (seciliSayfa == 3) {
-      return Anasayfa();
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Mesajlasma()),
+      );
     } else {
       Navigator.push(
         context,
@@ -65,48 +69,38 @@ class _NavigationBottomState extends State<NavigationBottom> {
           BottomNavigationBarItem(
               icon: ImageIcon(
                 AssetImage('assets/hizmet_alan_main.png'),
-                size: 22,
+                size: 30,
               ),
-              title: Padding(
-                padding: const EdgeInsets.only(top:7),
-                child: Text('Anasayfa', style: TextStyle(fontSize:10),),
-              )),
+              label: ''
+             ),
           BottomNavigationBarItem(
               icon: ImageIcon(
                 AssetImage('assets/hizmet_alan_kategori.png'),
-                size: 22,
+                size: 30,
               ),
-              title: Padding(
-                padding: const EdgeInsets.only(top:7),
-                child: Text('Kategori', style: TextStyle(fontSize:10),),
-              )),
+              label: ''
+            ),
           BottomNavigationBarItem(
               icon: ImageIcon(
                 AssetImage('assets/hizmet_alan_sepet.png'),
-                size: 22,
+                size: 30,
               ),
-              title: Padding(
-                padding: const EdgeInsets.only(top:7),
-                child: Text('Sepet', style: TextStyle(fontSize:10),),
-              )),
+              label: ''
+            ),
           BottomNavigationBarItem(
               icon: ImageIcon(
-                AssetImage('assets/hizmet_alan_favorite.png'),
-                size: 22,
+                AssetImage('assets/destek.png'),
+                size: 30,
               ),
-              title: Padding(
-                padding: const EdgeInsets.only(top:7),
-                child: Text('Favori', style: TextStyle(fontSize:10),),
-              )),
+              label: ''
+              ),
           BottomNavigationBarItem(
               icon: ImageIcon(
                 AssetImage('assets/hizmet_alan_account.png'),
-                size: 22,
+                size: 30,
               ),
-              title: Padding(
-                padding: const EdgeInsets.only(top:7),
-                child: Text('Hesabım', style: TextStyle(fontSize:10),),
-              )),
+              label: ''
+             ),
         ],
       )
     );

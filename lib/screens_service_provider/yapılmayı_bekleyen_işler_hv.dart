@@ -63,11 +63,11 @@ class _HizmetVerenListeState extends State<HizmetVerenListe> {
     print(userId);
     moving.clear();
     finished.clear();
-    print('https://ustasiyapsin-api.herokuapp.com/api/demand/get-by-user/' +
+    print('https://ustasiyapsin-api.herokuapp.com/api/demand/get-by-company/' +
         userId);
     final response = await http.get(
       Uri.parse(
-          'https://ustasiyapsin-api.herokuapp.com/api/demand/get-by-user/' +
+          'https://ustasiyapsin-api.herokuapp.com/api/demand/get-by-company/' +
               userId),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -117,6 +117,7 @@ class _HizmetVerenListeState extends State<HizmetVerenListe> {
           }
         });
       }
+     
       setState(() {
         isLoader = false;
         resultCount = result['data'].length;
@@ -366,7 +367,7 @@ class _HizmetVerenListeState extends State<HizmetVerenListe> {
                                                                             context,
                                                                             MaterialPageRoute(builder: (context) => HizmetVerenProfil(
                                                                               id: moving[index].id,
-                                                                              state: 1,
+                                                                              state: 3,
                                                                             )),
                                                                           );
                                                                         },

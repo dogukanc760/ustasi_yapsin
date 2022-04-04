@@ -1,5 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ustasi_yapsin/external_widgets/BottomNavigationBar1.dart';
+
+String username = '';
+  String name = '';
+  String surname = '';
+  String adress = '';
+  String gsm = '';
+  String userId = '';
+  String responses = '';
+  String mail = '';
+  String city = ''; 
+  String distinct = '';
 
 class Adreslerim extends StatelessWidget {
   const Adreslerim({Key? key}) : super(key: key);
@@ -33,6 +45,32 @@ class AdresIcerik extends StatefulWidget {
 }
 
 class _AdresIcerikState extends State<AdresIcerik> {
+   void getSession() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      username = prefs.getString('username').toString();
+      name = prefs.getString('name').toString();
+      surname = prefs.getString('surname').toString();
+      gsm = prefs.getString('gsm').toString();
+      userId = prefs.getString('id').toString();
+      adress = prefs.getString('adress').toString();
+      if (adress.length<4) {
+        adress='';
+      }
+      mail = prefs.getString('mail').toString();
+      
+    });
+    print(adress);
+    print(userId + username + name);
+  }
+  
+  @override
+  void initState() {
+    // TODO: implement initState
+    getSession();
+    super.initState();
+  }
+ 
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -79,7 +117,7 @@ class _AdresIcerikState extends State<AdresIcerik> {
                                 child: Center(
                                   child: Stack(children: [
                                     Text(
-                                      'Mustafa Müşteri',
+                                     name,
                                       style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold),
@@ -87,7 +125,7 @@ class _AdresIcerikState extends State<AdresIcerik> {
                                     Padding(
                                       padding: const EdgeInsets.fromLTRB(40, 20, 0, 0),
                                       child: Text(
-                                        'Denizli',
+                                        '',
                                         style: TextStyle(
                                             color:Colors.grey.shade500,
                                             fontSize: 12,

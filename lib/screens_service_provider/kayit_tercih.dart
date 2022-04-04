@@ -64,7 +64,7 @@ class MyCustomFormState extends State<MyCustomForm> {
             children: [
               Center(
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 70.0),
+                  padding: const EdgeInsets.only(top: 150.0),
                   child: Image(
                     image: AssetImage('assets/logo.png'),
                     height: 100,
@@ -196,16 +196,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                 ),
               ),
 
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: 450,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    fit: BoxFit.fill,
-                    image: AssetImage('assets/girislatkusak.png'),
-                  ),
-                ),
-              )
+              
 
             ],
           ),

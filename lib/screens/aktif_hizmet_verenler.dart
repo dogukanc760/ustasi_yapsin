@@ -3,7 +3,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:ustasi_yapsin/external_widgets/BottomNavigationBar1.dart';
 import 'package:ustasi_yapsin/screens/talep_basarili.dart';
 
-import '../screens_service_provider/hizmet_veren_profili.dart';
+import 'hizmet_veren_profili.dart';
 
 class AktifHizmetVerenler extends StatelessWidget {
   const AktifHizmetVerenler({Key? key}) : super(key: key);
@@ -91,9 +91,9 @@ class _HizmetVerenListeState extends State<HizmetVerenListe> {
                 )),
                 onPressed: () {
                   Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => TalepBasarili()),
-                );
+                    context,
+                    MaterialPageRoute(builder: (context) => TalepBasarili()),
+                  );
                 },
                 child: const Text('Tüm hizmet verenlerden teklif al'),
               ),
@@ -283,28 +283,32 @@ class _HizmetVerenListeState extends State<HizmetVerenListe> {
                                                               onPressed: () {
                                                                 Navigator.push(
                                                                   context,
-                                                                  MaterialPageRoute(builder: (context) => HizmetVerenProfil(
-                                                                    id: "1",
-                                                                    state: 1,
-                                                                  )),
+                                                                  MaterialPageRoute(
+                                                                      builder:
+                                                                          (context) =>
+                                                                              HizmetVerenProfil(
+                                                                                state: 0,
+                                                                                id: '',
+                                                                              )),
                                                                 );
                                                               },
                                                               child: Column(
                                                                 children: [
                                                                   Icon(
-                                                                    Icons
-                                                                        .more_horiz,
-                                                                    size:40,
+                                                                      Icons
+                                                                          .more_horiz,
+                                                                      size: 40,
                                                                       color: Colors
                                                                           .grey
-                                                                          .shade500
-                                                                  ),
+                                                                          .shade500),
                                                                   Text(
                                                                       'Profiline bak',
                                                                       style: TextStyle(
                                                                           color: Colors
                                                                               .grey
-                                                                              .shade500, fontSize: 12))
+                                                                              .shade500,
+                                                                          fontSize:
+                                                                              12))
                                                                 ],
                                                               )))
                                                     ],

@@ -43,6 +43,8 @@ String username = '';
   String userId = '';
   String responses = '';
   String mail = '';
+  String city = ''; 
+  String distinct = '';
 class _ProfilimState extends State<Profilim> {
  
 
@@ -57,14 +59,20 @@ class _ProfilimState extends State<Profilim> {
       gsm = prefs.getString('gsm').toString();
       userId = prefs.getString('id').toString();
       adress = prefs.getString('adress').toString();
+      if (adress.length<4) {
+        adress='';
+      }
       mail = prefs.getString('mail').toString();
+      
     });
-
+    print(adress);
     print(userId + username + name);
   }
    final nameController = TextEditingController(text:name);
   final mailController = TextEditingController(text:username);
   final gsmController = TextEditingController(text:gsm);
+  final cityController = TextEditingController(text:'');
+  final distinctController = TextEditingController(text:'');
 
   Future<String> login(String mail, String gsm, String name) async {
     setState(() {
@@ -76,7 +84,7 @@ class _ProfilimState extends State<Profilim> {
       'Content-Type': 'application/json; charset=UTF-8',
     },
     body: jsonEncode(
-        <String, String>{'gsm': mail, 'mail': mail, 'name': name}),
+        <String, String>{'gsm': mail, 'mail': mail, 'name': name, 'adress':cityController.text}),
   );
 
   if (response.statusCode == 201) {
@@ -98,6 +106,9 @@ class _ProfilimState extends State<Profilim> {
   @override
   void initState() {
     getSession();
+    nameController.text = name;
+    gsmController.text = gsm;
+    mailController.text = mail;
     // TODO: implement initState
     super.initState();
   }
@@ -288,6 +299,46 @@ class _ProfilimState extends State<Profilim> {
                 },
               ),
             ),
+             Padding(
+              padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
+              child: TextFormField(
+               controller: cityController,
+                enableSuggestions: false,
+                autocorrect: false,
+                // The validator receives the text that the user has entered.
+                decoration: InputDecoration(
+                    focusColor: Colors.deepPurple,
+                    hintText: 'Şehir',
+                    hintStyle: TextStyle(fontSize: 12)),
+
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Gsm Boş Geçilemez!';
+                  }
+                  return null;
+                },
+              ),
+            ),
+              Padding(
+              padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
+              child: TextFormField(
+                controller: distinctController,
+                enableSuggestions: false,
+                autocorrect: false,
+                // The validator receives the text that the user has entered.
+                decoration: InputDecoration(
+                    focusColor: Colors.deepPurple,
+                    hintText: 'İlçe',
+                    hintStyle: TextStyle(fontSize: 12)),
+
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Gsm Boş Geçilemez!';
+                  }
+                  return null;
+                },
+              ),
+            ),         
             Padding(
               padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
               child: TextFormField(

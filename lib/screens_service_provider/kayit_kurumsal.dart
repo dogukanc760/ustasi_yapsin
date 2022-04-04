@@ -1,6 +1,34 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ustasi_yapsin/screens_service_provider/giris_yap_hizmet.dart';
 import 'package:ustasi_yapsin/screens_service_provider/kayit_tamamlama.dart';
 import 'package:ustasi_yapsin/screens_service_provider/kayit_tercih.dart';
+import 'package:http/http.dart' as http;
+
+void foos(BuildContext context) async {
+  final prefs = await SharedPreferences.getInstance();
+  username = prefs.getString('username').toString();
+
+  if (!username.isEmpty) {
+    print(prefs.getString('username').toString());
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => GirisHizmet()),
+    );
+  } else {
+    print("boş");
+  }
+}
+
+String username = '';
+final gsm = TextEditingController();
+final company = TextEditingController();
+final taxNum = TextEditingController();
+final password = TextEditingController();
+final mail = TextEditingController();
+final fullName = TextEditingController();
 
 class KurumsalKayit extends StatelessWidget {
   const KurumsalKayit({Key? key}) : super(key: key);
@@ -10,7 +38,12 @@ class KurumsalKayit extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         resizeToAvoidBottomInset: true,
-        body: const MyCustomForm(),
+       body: SafeArea(
+          top: true,
+          bottom: true,
+          left: true,
+          right: true,
+          child: const MyCustomForm()),
       ),
     );
   }
@@ -36,6 +69,51 @@ class MyCustomFormState extends State<MyCustomForm> {
   // not a GlobalKey<MyCustomFormState>.
   final _formKey = GlobalKey<FormState>();
   bool _passwordVisible = true;
+var isLoading = false;
+   Future<void> register(String mail, String password, String fullname, String gsm,String company, String taxNum,BuildContext context) async {
+    setState(() {
+      isLoading = true;
+    });
+    final response = await http.post(
+      Uri.parse('https://ustasiyapsin-api.herokuapp.com/api/auth/register-business'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(
+          <String, String>{'gsm': gsm, 'mail': mail, 'name':fullname, 'surname':fullname,'password': password,
+          'company':company, 'taxNum':taxNum
+         }),
+    );
+
+    if (response.statusCode == 201) {
+      
+      print(response.statusCode);
+      final prefs = await SharedPreferences.getInstance();
+      var result = jsonDecode(response.body);
+      print(result['data']);
+      prefs.setString('username', result['data']['mail']);
+      prefs.setString('name', result['data']['name']);
+      prefs.setString('surname', result['data']['surname']);
+      prefs.setString('gsm', result['data']['gsm']);
+      prefs.setString('id', result['data']['_id']);
+      prefs.setString('adress', jsonEncode(result['data']['adress']));
+      prefs.setString('img', '');
+
+      print(prefs.getString('adress'));
+      setState(() {
+        isLoading = false;
+      });
+      foos(context);
+
+     
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      showAlertDialogFailed(context);
+      throw Exception();
+    }
+  }
 
 
   @override
@@ -59,28 +137,88 @@ class MyCustomFormState extends State<MyCustomForm> {
       children: [
         Form(
           key: _formKey,
-          child: Column(
+          child:  isLoading
+              ? Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 350, 0, 0),
+                  child: Column(
+                    children: [
+                      Center(child: CircularProgressIndicator()),
+                      Center(
+                          child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'Kayıt Yapılıyor...',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                      ))
+                    ],
+                  ),
+                )
+              : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(child: Padding(
-                padding: const EdgeInsets.only(top:30),
-                child: Text('Kurumsal Kayıt', style: TextStyle(color:Colors.blueGrey[200], fontWeight: FontWeight.bold),),
-              )),
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
-                  child: Image(
-                    image: AssetImage('assets/logo.png'),
-                    height: 100,
-                    width: 100,
-                    alignment: Alignment.center,
+               Container(
+                    // transform: Matrix4.translationValues(0.0, -60.0, 0.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 15, 40, 0),
+                          child: Center(
+                              child: Text('Kurumsal Kayıt',
+                                  style: TextStyle(
+                                      color: Color(0xFF9B00CF),
+                                      fontWeight: FontWeight.bold))),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ),
+                  Container(
+                    //  transform: Matrix4.translationValues(0.0, -60.0, 0.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Center(
+                          child: Container(
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 20, 30, 0),
+                              child: Image(
+                                image: AssetImage('assets/logo.png'),
+                                height: 100,
+                                width: 100,
+                                alignment: Alignment.center,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    // transform: Matrix4.translationValues(0.0, -60.0, 0.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 10, 40, 0),
+                          child: Center(
+                              child: Text('Uzmanabak',
+                                  style: TextStyle(
+                                      color: Color(0xFF9B00CF),
+                                      fontWeight: FontWeight.bold))),
+                        ),
+                      ],
+                    ),
+                  ),
               Center(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(40, 20, 40, 0),
                   child: TextFormField(
+                    controller:company,
                     // The validator receives the text that the user has entered.
                     decoration: InputDecoration(
                         contentPadding: new EdgeInsets.symmetric(
@@ -104,6 +242,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
                   child: TextFormField(
+                    controller:taxNum,
                     // The validator receives the text that the user has entered.
                     decoration: InputDecoration(
                         contentPadding: new EdgeInsets.symmetric(
@@ -127,6 +266,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
                   child: TextFormField(
+                    controller:fullName,
                     // The validator receives the text that the user has entered.
                     decoration: InputDecoration(
                         contentPadding: new EdgeInsets.symmetric(
@@ -149,6 +289,7 @@ class MyCustomFormState extends State<MyCustomForm> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
                 child: TextFormField(
+                  controller:mail,
                   // The validator receives the text that the user has entered.
                   decoration: InputDecoration(
                       contentPadding: new EdgeInsets.symmetric(
@@ -170,6 +311,7 @@ class MyCustomFormState extends State<MyCustomForm> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
                 child: TextFormField(
+                  controller:gsm,
                   // The validator receives the text that the user has entered.
                   decoration: InputDecoration(
                       contentPadding: new EdgeInsets.symmetric(
@@ -191,6 +333,7 @@ class MyCustomFormState extends State<MyCustomForm> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(40, 10, 40, 0),
                 child: TextFormField(
+                  controller:password,
                   obscureText: _passwordVisible,
                   enableSuggestions: false,
                   autocorrect: false,
@@ -239,26 +382,18 @@ class MyCustomFormState extends State<MyCustomForm> {
                           const SnackBar(content: Text('Processing Data')),
                         );
                       }*/
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => ProfilTamamla()),
-                      );
+                      // Navigator.pushReplacement(
+                      //   context,
+                      //   MaterialPageRoute(builder: (context) => ProfilTamamla()),
+                      // );
+                      register(mail.text, password.text, fullName.text, gsm.text, company.text, taxNum.text, context);
                     },
                     child: const Text('Kayıt Ol'),
                   ),
                 ),
               ),
 
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: 450,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    fit: BoxFit.fill,
-                    image: AssetImage('assets/girislatkusak.png'),
-                  ),
-                ),
-              )
+            
 
             ],
           ),

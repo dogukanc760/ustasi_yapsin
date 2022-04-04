@@ -59,7 +59,7 @@ class ProfilIcerik extends StatefulWidget {
 class _ProfilIcerikState extends State<ProfilIcerik> {
   var isLoader = false;
   _makingPhoneCall() async {
-    const url = 'tel:+90 5059948910';
+    const url = 'tel:+90 123123123';
     if (await canLaunch(url)) {
       await launch(url);
     } else {
@@ -113,6 +113,7 @@ class _ProfilIcerikState extends State<ProfilIcerik> {
  @override
   void initState() {
     print('dodo');
+    print(widget.state);
     getDemands();
     super.initState();
   }
@@ -497,7 +498,111 @@ class _ProfilIcerikState extends State<ProfilIcerik> {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 0, 30),
-              child: Row(
+              child: widget.state==2?Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(10,15,0,0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 175,
+                            child: FlatButton(
+                                onPressed: () {
+                                /*  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => TalepBasarili()),
+                                  );*/
+                                },
+                                color: Colors.grey[300],
+                                child: Text(
+                                  'İptal Et',
+                                  style: TextStyle(color: Colors.grey,fontSize: 17,),
+                                ))),
+
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(0,15,0,0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                              width: 175,
+                              child: FlatButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => IsinYapildiginiOnaylaHv()),
+                                    );
+                                  },
+                                  color: Colors.deepPurple,
+                                  child: Text(
+                                    'Teklif Ver',
+                                    style: TextStyle(color: Colors.white,fontSize: 17,),
+                                  ))),
+
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ):widget.state==3?Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(10,15,0,0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 175,
+                            child: FlatButton(
+                                onPressed: () {
+                                /*  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => TalepBasarili()),
+                                  );*/
+                                },
+                                color: Colors.grey[300],
+                                child: Text(
+                                  'İptal Et',
+                                  style: TextStyle(color: Colors.grey,fontSize: 17,),
+                                ))),
+
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(0,15,0,0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                              width: 175,
+                              child: FlatButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => IsinYapildiginiOnaylaHv()),
+                                    );
+                                  },
+                                  color: Colors.deepPurple,
+                                  child: Text(
+                                    'Teklif Ver',
+                                    style: TextStyle(color: Colors.white,fontSize: 14,),
+                                  ))),
+
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ):Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Padding(

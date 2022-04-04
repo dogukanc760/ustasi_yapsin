@@ -1,8 +1,14 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ustasi_yapsin/external_widgets/BottomNavigationBar_hv.dart';
 import 'package:ustasi_yapsin/screens/girissayfasi.dart';
-import  'adreslerim_hv.dart';
+import 'package:ustasi_yapsin/screens_service_provider/bakiyem_hv.dart';
+import 'adreslerim_hv.dart';
 import 'destek_hv.dart';
 import 'guvenlik_hv.dart';
 import 'profilim_hv.dart';
@@ -13,16 +19,96 @@ class HesabimHizmet extends StatefulWidget {
   @override
   State<HesabimHizmet> createState() => _HesabimHizmetState();
 }
-String username ='';
-String name ='';
-String surname='';
+_displayDialog(BuildContext context) async {
+    
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor: Colors.white,
+            title:Column(
+              children: [
+                Text('Uygulamayı Paylaşabilirsiniz!', style:TextStyle(color: Color(0xFF9B00CF), fontWeight: FontWeight.bold)),
+                  Container(
+                    child: Padding(
+                              padding: const EdgeInsets.only(left: 0),
+                              child: Container(
+                                 transform: Matrix4.translationValues(0.0, 40.0, 0.0),
+                                width: 70,
+                                height: 70,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    fit: BoxFit.fill,
+                                    image:
+                                        AssetImage('assets/logo.png'),
+                                  ),
+                                ),
+                              ),
+                            ),
+                  ),
+              ],
+            ),
+            content: Text(''),
+            actions: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                
+                  new FlatButton(
+                    color: Color(0xFF6E1B9D),
+                    child: Row(
+                      children: [
+                        Icon(FontAwesomeIcons.telegram, color: Colors.white, size:20),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+                          child: Text('Telegram', style: TextStyle(color: Colors.white),),
+                        ),
+                      ],
+                    ),//new Text('Ara', style: TextStyle(color: Colors.white),),
+                    onPressed: () {
+                     
+                    },
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 15),
+                    child: new FlatButton(
+                      color: Color(0xFF6E1B9D),
+                      child: Row(
+                        children: [
+                          Icon(FontAwesomeIcons.whatsapp, color: Colors.white, size:20),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+                            child: Text('WhatsApp', style: TextStyle(color: Colors.white),),
+                          ),
+                        ],
+                      ),//new Text('Ara', style: TextStyle(color: Colors.white),),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                ],
+              )
+            ],
+          );
+        });
+  }
+
+
+String username = '';
+String name = '';
+String surname = '';
 String adress = '';
-String gsm ='';
+String gsm = '';
 String userId = '';
+Future<File>? file;
+String status = '';
+late String base64Image;
+late File tmpFile;
+String errMessage = 'Error Uploading Image';
+
 class _HesabimHizmetState extends State<HesabimHizmet> {
-
-   void getSession() async {
-
+  void getSession() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       username = prefs.getString('username').toString();
@@ -33,10 +119,9 @@ class _HesabimHizmetState extends State<HesabimHizmet> {
       adress = prefs.getString('adress').toString();
     });
 
-    print(userId+username+name);
-
+    print(userId + username + name);
   }
-  
+
   void destroySession(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
@@ -45,8 +130,58 @@ class _HesabimHizmetState extends State<HesabimHizmet> {
       MaterialPageRoute(builder: (context) => GirisSayfasi()),
     );
   }
-
-   @override
+  chooseImage() {
+    setState(() {
+      file = ImagePicker.pickImage(source: ImageSource.gallery);
+    });
+  }
+  setStatus(String message) {
+    setState(() {
+      status = message;
+    });
+  }
+  Widget showImage() {
+    return FutureBuilder<File>(
+      future: file,
+      builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
+        if (snapshot.connectionState == ConnectionState.done &&
+            null != snapshot.data) {
+          tmpFile = snapshot.data!;
+          base64Image = base64Encode(snapshot.data!.readAsBytesSync());
+          return Flexible(
+            child: SizedBox(
+              height:150,
+              width:150,
+              child: Image.file(
+                snapshot.data!,
+                fit: BoxFit.fill,
+              ),
+            ),
+          );
+        } else if (null != snapshot.error) {
+          return const Text(
+            'Error Picking Image',
+            textAlign: TextAlign.center,
+          );
+        } else {
+          return const Text(
+            'No Image Selected',
+            textAlign: TextAlign.center,
+          );
+        }
+      },
+    );
+  }
+  startUpload() {
+    setStatus('Uploading Image...');
+    if (null == tmpFile) {
+      setStatus(errMessage);
+      return;
+    }
+    String fileName = tmpFile.path.split('/').last;
+    //upload(fileName);
+  }
+  @override
   void initState() {
     getSession();
     // TODO: implement initState
@@ -57,7 +192,6 @@ class _HesabimHizmetState extends State<HesabimHizmet> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        
         body: SafeArea(
           top: true,
           bottom: true,
@@ -72,15 +206,15 @@ class _HesabimHizmetState extends State<HesabimHizmet> {
                       child: Stack(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                        padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
                         child: SizedBox(
                           width: MediaQuery.of(context).size.width,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               SizedBox(
-                                width: 100,
-                                height: 100,
+                                width: 150,
+                                height: 150,
                                 child: Container(
                                   decoration: BoxDecoration(
                                       shape: BoxShape.circle,
@@ -90,16 +224,24 @@ class _HesabimHizmetState extends State<HesabimHizmet> {
                                             Colors.deepPurple,
                                           ],
                                           begin: Alignment.bottomLeft,
-                                          end: Alignment.topRight
-                                      )
-                                  ),
+                                          end: Alignment.topRight)),
                                   child: CircleAvatar(
+                                    child: showImage(),
                                     radius: 30.0,
-                                    /*backgroundImage:
-                                        AssetImage('assets/ikon8.png'),*/
+
                                     backgroundColor: Colors.transparent,
                                   ),
                                 ),
+                              ),
+                              Container(
+                                  transform: Matrix4.translationValues(30.0, -30.0, 0.0),
+                                  child:IconButton(
+                                      onPressed: (){
+                                        setState(() {
+                                          chooseImage();
+                                        });
+                                      },
+                                      icon: Icon(Icons.photo_camera, color: Colors.deepPurple,size:30))
                               ),
                               SizedBox(
                                 width: MediaQuery.of(context).size.width,
@@ -113,11 +255,12 @@ class _HesabimHizmetState extends State<HesabimHizmet> {
                                             fontWeight: FontWeight.bold),
                                       ),
                                       Padding(
-                                        padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                        padding: const EdgeInsets.fromLTRB(
+                                            40, 20, 0, 0),
                                         child: Text(
-                                          '',
+                                          adress,
                                           style: TextStyle(
-                                            color:Colors.grey.shade500,
+                                              color: Colors.grey.shade500,
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold),
                                         ),
@@ -125,7 +268,8 @@ class _HesabimHizmetState extends State<HesabimHizmet> {
                                     ]),
                                   ),
                                   height: 140.0,
-                                  width: MediaQuery.of(context).size.width - 100.0,
+                                  width:
+                                  MediaQuery.of(context).size.width - 100.0,
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(5),
                                       color: Colors.white,
@@ -135,15 +279,17 @@ class _HesabimHizmetState extends State<HesabimHizmet> {
                                           fit: BoxFit.fill)),
                                 ),
                               )
+                              ,
                             ],
                           ),
                         ),
                       )
                     ],
                   )),
+
                   SizedBox(
-                    width:MediaQuery.of(context).size.width,
-                    child:Row(
+                    width: MediaQuery.of(context).size.width,
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Padding(
@@ -156,17 +302,89 @@ class _HesabimHizmetState extends State<HesabimHizmet> {
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                          child: TextButton(onPressed: (){
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => Profil()),
-                            );
-                          }, child: Text('Profilim', style:TextStyle(color:Colors.grey.shade500, fontWeight: FontWeight.bold, fontSize: 16))),
+                          child: TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Profil()),
+                                );
+                              },
+                              child: Text('Profilim',
+                                  style: TextStyle(
+                                      color: Colors.grey.shade500,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16))),
                         )
                       ],
                     ),
                   ),
-                  //Yorum satırlı 
+                  // SizedBox(
+                  //   width: MediaQuery.of(context).size.width,
+                  //   child: Row(
+                  //     mainAxisAlignment: MainAxisAlignment.start,
+                  //     children: [
+                  //       Padding(
+                  //         padding: const EdgeInsets.fromLTRB(40, 0, 0, 0),
+                  //         child: Icon(
+                  //           Icons.security,
+                  //           color: Colors.grey,
+                  //           size: 23,
+                  //         ),
+                  //       ),
+                  //       Padding(
+                  //         padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                  //         child: TextButton(
+                  //             onPressed: () {
+                  //               Navigator.push(
+                  //                 context,
+                  //                 MaterialPageRoute(
+                  //                     builder: (context) => Profil()),
+                  //               );
+                  //             },
+                  //             child: Text('Güvenlik ve Doğrulama',
+                  //                 style: TextStyle(
+                  //                     color: Colors.grey.shade500,
+                  //                     fontWeight: FontWeight.bold,
+                  //                     fontSize: 16))),
+                  //       )
+                  //     ],
+                  //   ),
+                  // ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(40, 0, 0, 0),
+                          child: Icon(
+                            Icons.wallet_membership_rounded,
+                            color: Colors.grey,
+                            size: 23,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                          child: TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Bakiyem()),
+                                );
+                              },
+                              child: Text('Cüzdan',
+                                  style: TextStyle(
+                                      color: Colors.grey.shade500,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16))),
+                        )
+                      ],
+                    ),
+                  ),
+
+                  //Yorum satırlı
                   // SizedBox(
                   //   width:MediaQuery.of(context).size.width,
                   //   child:Row(
@@ -243,8 +461,8 @@ class _HesabimHizmetState extends State<HesabimHizmet> {
                   //   ),
                   // ),
                   SizedBox(
-                    width:MediaQuery.of(context).size.width,
-                    child:Row(
+                    width: MediaQuery.of(context).size.width,
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Padding(
@@ -257,40 +475,50 @@ class _HesabimHizmetState extends State<HesabimHizmet> {
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                          child: TextButton(onPressed: (){
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => Destek()),
-                            );
-                          }, child: Text('Whatsapp Destek', style:TextStyle(color:Colors.grey.shade500, fontSize: 16))),
+                          child: TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Destek()),
+                                );
+                              },
+                              child: Text('Whatsapp Destek',
+                                  style: TextStyle(
+                                      color: Colors.grey.shade500,
+                                      fontSize: 16))),
                         )
                       ],
                     ),
                   ),
+                  // SizedBox(
+                  //   width: MediaQuery.of(context).size.width,
+                  //   child: Row(
+                  //     mainAxisAlignment: MainAxisAlignment.start,
+                  //     children: [
+                  //       Padding(
+                  //         padding: const EdgeInsets.fromLTRB(40, 0, 0, 0),
+                  //         child: Icon(
+                  //           Icons.contact_support_outlined,
+                  //           color: Colors.grey,
+                  //           size: 23,
+                  //         ),
+                  //       ),
+                  //       Padding(
+                  //         padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                  //         child: TextButton(
+                  //             onPressed: () {},
+                  //             child: Text('Sık Sorulan Sorular',
+                  //                 style: TextStyle(
+                  //                     color: Colors.grey.shade500,
+                  //                     fontSize: 16))),
+                  //       )
+                  //     ],
+                  //   ),
+                  // ),
                   SizedBox(
-                    width:MediaQuery.of(context).size.width,
-                    child:Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(40, 0, 0, 0),
-                          child: Icon(
-                            Icons.contact_support_outlined,
-                            color: Colors.grey,
-                            size: 23,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                          child: TextButton(onPressed: (){}, child: Text('Sık Sorulan Sorular',
-                              style:TextStyle(color:Colors.grey.shade500, fontSize: 16))),
-                        )
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width:MediaQuery.of(context).size.width,
-                    child:Row(
+                    width: MediaQuery.of(context).size.width,
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Padding(
@@ -303,15 +531,19 @@ class _HesabimHizmetState extends State<HesabimHizmet> {
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                          child: TextButton(onPressed: (){}, child: Text('Arkadaşına tavsiye et',
-                              style:TextStyle(color:Colors.grey.shade500, fontSize: 16))),
+                          child: TextButton(
+                              onPressed: () {_displayDialog(context);},
+                              child: Text('Arkadaşına tavsiye et',
+                                  style: TextStyle(
+                                      color: Colors.grey.shade500,
+                                      fontSize: 16))),
                         )
                       ],
                     ),
                   ),
                   SizedBox(
-                    width:MediaQuery.of(context).size.width,
-                    child:Row(
+                    width: MediaQuery.of(context).size.width,
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Padding(
@@ -324,20 +556,25 @@ class _HesabimHizmetState extends State<HesabimHizmet> {
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                          child: TextButton(onPressed: (){
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => Adreslerim()),
-                            );
-                          }, child: Text('Adreslerim',
-                              style:TextStyle(color:Colors.grey.shade500, fontSize: 16))),
+                          child: TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Adreslerim()),
+                                );
+                              },
+                              child: Text('Adreslerim',
+                                  style: TextStyle(
+                                      color: Colors.grey.shade500,
+                                      fontSize: 16))),
                         )
                       ],
                     ),
                   ),
                   SizedBox(
-                    width:MediaQuery.of(context).size.width,
-                    child:Row(
+                    width: MediaQuery.of(context).size.width,
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Padding(
@@ -350,8 +587,14 @@ class _HesabimHizmetState extends State<HesabimHizmet> {
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                          child: TextButton(onPressed: (){destroySession(context);}, child: Text('Çıkış Yap',
-                              style:TextStyle(color:Colors.grey.shade500, fontSize: 16))),
+                          child: TextButton(
+                              onPressed: () {
+                                destroySession(context);
+                              },
+                              child: Text('Çıkış Yap',
+                                  style: TextStyle(
+                                      color: Colors.grey.shade500,
+                                      fontSize: 16))),
                         )
                       ],
                     ),
